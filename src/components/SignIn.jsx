@@ -3,40 +3,94 @@
 import { useState, useEffect } from "react"
 import "../styles/SignIn.css"
 
-export default function SpaceSignInPage() {
+export default function BrainByteSignInPage() {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [stars, setStars] = useState([])
-  const [shootingStars, setShootingStars] = useState([])
+  const [codeParticles, setCodeParticles] = useState([])
+  const [matrixRain, setMatrixRain] = useState([])
 
   useEffect(() => {
-    // Generate stars
-    const generatedStars = []
-    for (let i = 0; i < 100; i++) {
-      generatedStars.push({
+    // Generate code particles
+    const generatedParticles = []
+    for (let i = 0; i < 80; i++) {
+      generatedParticles.push({
         id: i,
         size: Math.random() * 3,
         top: Math.random() * 100,
         left: Math.random() * 100,
         opacity: Math.random() * 0.8 + 0.2,
         duration: Math.random() * 5 + 3,
+        content: getRandomCodeSymbol(),
+        color: getRandomCodeColor(),
       })
     }
-    setStars(generatedStars)
+    setCodeParticles(generatedParticles)
 
-    // Generate shooting stars
-    const generatedShootingStars = []
-    for (let i = 0; i < 5; i++) {
-      generatedShootingStars.push({
+    // Generate matrix rain
+    const generatedRain = []
+    for (let i = 0; i < 15; i++) {
+      generatedRain.push({
         id: i,
-        top: Math.random() * 70,
-        left: Math.random() * 70,
+        top: -20 - Math.random() * 10,
+        left: Math.random() * 100,
         delay: Math.random() * 5,
         duration: Math.random() * 10 + 10,
+        length: Math.floor(Math.random() * 20) + 10,
       })
     }
-    setShootingStars(generatedShootingStars)
+    setMatrixRain(generatedRain)
   }, [])
+
+  const getRandomCodeSymbol = () => {
+    const symbols = [
+      "{ }",
+      "[ ]",
+      "( )",
+      "<>",
+      "//",
+      "/*",
+      "*/",
+      "&&",
+      "||",
+      "==",
+      "===",
+      "!=",
+      "!==",
+      "=>",
+      "++",
+      "--",
+      "+=",
+      "-=",
+      "*=",
+      "/=",
+      "%=",
+      "<<",
+      ">>",
+      "<<<",
+      ">>>",
+      "&=",
+      "|=",
+      "^=",
+      "~",
+      "?",
+      ":",
+      ";",
+      ",",
+      ".",
+      "#",
+      "@",
+      "$",
+      "_",
+      "0",
+      "1",
+    ]
+    return symbols[Math.floor(Math.random() * symbols.length)]
+  }
+
+  const getRandomCodeColor = () => {
+    const colors = ["#a78bfa", "#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6", "#c4b5fd", "#ddd6fe", "#ede9fe", "#f5f3ff"]
+    return colors[Math.floor(Math.random() * colors.length)]
+  }
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value)
@@ -58,64 +112,66 @@ export default function SpaceSignInPage() {
   }
 
   return (
-    <div className="space-container">
-      {/* Left side - Space Background with Text */}
-      <div className="space-background">
-        {/* Stars */}
-        <div className="stars-container">
-          {stars.map((star) => (
+    <div className="brainbyte-container">
+      {/* Left side - Code Background with Text */}
+      <div className="code-background">
+        {/* Code particles */}
+        <div className="particles-container">
+          {codeParticles.map((particle) => (
             <div
-              key={star.id}
-              className="star"
+              key={particle.id}
+              className="code-particle"
               style={{
-                width: `${star.size}px`,
-                height: `${star.size}px`,
-                top: `${star.top}%`,
-                left: `${star.left}%`,
-                opacity: star.opacity,
-                animation: `twinkle ${star.duration}s infinite`,
+                fontSize: `${particle.size * 5 + 8}px`,
+                top: `${particle.top}%`,
+                left: `${particle.left}%`,
+                opacity: particle.opacity,
+                color: particle.color,
+                animation: `float ${particle.duration}s infinite`,
               }}
-            />
+            >
+              {particle.content}
+            </div>
           ))}
         </div>
 
-        {/* Shooting stars */}
-        {shootingStars.map((star) => (
-          <div
-            key={star.id}
-            className="shooting-star"
-            style={{
-              width: "2px",
-              height: "2px",
-              top: `${star.top}%`,
-              left: `${star.left}%`,
-              animation: `shootingstar ${star.duration}s ${star.delay}s infinite linear`,
-            }}
-          />
-        ))}
-
-        {/* Blue Planet */}
-        <div className="blue-planet">
-          <div className="planet-cloud" style={{ width: "160px", height: "80px", top: "20%", left: "10%" }}></div>
-          <div className="planet-cloud" style={{ width: "240px", height: "64px", top: "40%", left: "20%" }}></div>
-          <div className="planet-cloud" style={{ width: "128px", height: "96px", top: "60%", left: "50%" }}></div>
+        {/* Matrix rain */}
+        <div className="matrix-container">
+          {matrixRain.map((column) => (
+            <div
+              key={column.id}
+              className="matrix-column"
+              style={{
+                top: `${column.top}%`,
+                left: `${column.left}%`,
+                animationDelay: `${column.delay}s`,
+                animationDuration: `${column.duration}s`,
+              }}
+            >
+              {Array.from({ length: column.length }).map((_, i) => (
+                <div
+                  key={i}
+                  className="matrix-character"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                    opacity: 1 - i / column.length,
+                  }}
+                >
+                  {Math.random() > 0.5 ? "0" : "1"}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
-
-        {/* Purple Planet */}
-        <div className="purple-planet">
-          <div className="planet-cloud" style={{ width: "80px", height: "40px", top: "30%", left: "20%" }}></div>
-        </div>
-
-        {/* Small Purple Planet */}
-        <div className="small-purple-planet"></div>
 
         {/* Text overlay at the bottom */}
-        <div className="adventure-text">
+        <div className="escape-text">
           <h2>
-            SIGN IN TO YOUR
+            SIGN IN TO
             <br />
-            <span>ADVENTURE!</span>
+            <span>ESCAPE THE CODE</span>
           </h2>
+          <p>Solve puzzles. Break the locks. Debug your way out.</p>
         </div>
       </div>
 
@@ -123,8 +179,10 @@ export default function SpaceSignInPage() {
       <div className="form-container">
         <div className="form-content">
           <div className="form-header">
-            <h1>SIGN IN</h1>
-            <p>Sign in with email address</p>
+            <h1>
+              ACCESS <span className="highlight">BRAINBYTE</span>
+            </h1>
+            <p>Sign in with your credentials to begin</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -147,13 +205,13 @@ export default function SpaceSignInPage() {
                   value={email}
                   onChange={handleEmailChange}
                   className="email-input"
-                  placeholder="Yourname@gmail.com"
+                  placeholder="user@brainbyte.io"
                 />
               </div>
             </div>
 
             <button type="submit" disabled={isSubmitting} className="signup-button">
-              {isSubmitting ? "Signing up..." : "Sign up"}
+              {isSubmitting ? "AUTHENTICATING..." : "ENTER THE GAME"}
             </button>
           </form>
 
@@ -190,7 +248,7 @@ export default function SpaceSignInPage() {
           </div>
 
           <div className="terms-text">
-            By registering you with our{" "}
+            By signing in you agree to our{" "}
             <a href="#" className="terms-link">
               Terms and Conditions
             </a>

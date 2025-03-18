@@ -1,308 +1,299 @@
 /* Base styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Fira Code", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Open Sans", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+}
+
+.brainbyte-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Left side - Code Background */
+.code-background {
+  width: 60%;
+  position: relative;
+  background-color: #0d1117;
+  overflow: hidden;
+}
+
+.particles-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.code-particle {
+  position: absolute;
+  font-family: "Fira Code", monospace;
+  font-weight: 500;
+}
+
+.matrix-container {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.matrix-column {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: matrix-fall linear infinite;
+}
+
+.matrix-character {
+  color: #8b5cf6;
+  font-size: 14px;
+  opacity: 0;
+  animation: fade-in 0.5s forwards;
+}
+
+.escape-text {
+  position: absolute;
+  bottom: 64px;
+  left: 64px;
+  z-index: 3;
+}
+
+.escape-text h2 {
+  color: white;
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.escape-text span {
+  color: #a78bfa;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+}
+
+.escape-text p {
+  color: #ddd;
+  font-size: 18px;
+  margin-top: 12px;
+  max-width: 400px;
+}
+
+/* Right side - Form */
+.form-container {
+  width: 40%;
+  background-color: #161b22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.form-content {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-header h1 {
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 32px;
+  font-family: "Fira Code", monospace;
+}
+
+.highlight {
+  color: #a78bfa;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+}
+
+.form-header p {
+  font-size: 14px;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.email-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #d1d5db;
+}
+
+.email-input {
+  width: 100%;
+  background-color: #0d1117;
+  color: white;
+  padding: 12px 12px 12px 40px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  outline: none;
+  font-size: 16px;
+  font-family: "Fira Code", monospace;
+}
+
+.email-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.email-input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.signup-button {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(to right, #8b5cf6, #6d28d9);
+  transition: all 0.3s ease;
+  font-family: "Fira Code", monospace;
+  letter-spacing: 1px;
+}
+
+.signup-button:hover {
+  background: linear-gradient(to right, #a78bfa, #7c3aed);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+.signup-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #161b22, 0 0 0 4px rgba(139, 92, 246, 0.5);
+}
+
+.signup-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.divider {
+  position: relative;
+  margin: 24px 0;
+}
+
+.divider-line {
+  width: 100%;
+  height: 1px;
+  background-color: #30363d;
+}
+
+.divider-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #161b22;
+  padding: 0 8px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.google-button,
+.facebook-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.google-button {
+  background-color: #8b5cf6;
+}
+
+.google-button:hover {
+  background-color: #7c3aed;
+}
+
+.facebook-button {
+  background-color: #6d28d9;
+}
+
+.facebook-button:hover {
+  background-color: #5b21b6;
+}
+
+.social-icon {
+  margin-right: 8px;
+}
+
+.terms-text {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.terms-link {
+  color: #a78bfa;
+  text-decoration: none;
+}
+
+.terms-link:hover {
+  color: #c4b5fd;
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.2;
   }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-      "Helvetica Neue", sans-serif;
-    line-height: 1.5;
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.8;
   }
-  
-  .space-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-100%);
   }
-  
-  /* Left side - Space Background */
-  .space-background {
-    width: 60%;
-    position: relative;
-    background-color: #0c0024;
-    overflow: hidden;
+  100% {
+    transform: translateY(1000px);
   }
-  
-  .stars-container {
-    position: absolute;
-    inset: 0;
-  }
-  
-  .star {
-    position: absolute;
-    border-radius: 50%;
-    background-color: white;
-  }
-  
-  .shooting-star {
-    position: absolute;
-    background-color: white;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 3px 2px rgba(255, 255, 255, 0.1), 0 0 8px 5px
-      rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fade-in {
+  0% {
     opacity: 0;
   }
-  
-  .blue-planet {
-    position: absolute;
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    background: linear-gradient(to bottom right, #38b6ff, #1a6e8a);
-    top: 10%;
-    left: 5%;
-    box-shadow: 0 0 40px 5px rgba(56, 182, 255, 0.3);
-    overflow: hidden;
+  100% {
+    opacity: 0.8;
   }
-  
-  .planet-cloud {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    filter: blur(8px);
-  }
-  
-  .purple-planet {
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    background: linear-gradient(to bottom right, #a78bfa, #2d1b69);
-    top: 40%;
-    right: 20%;
-    box-shadow: 0 0 30px 2px rgba(138, 79, 255, 0.3);
-    overflow: hidden;
-  }
-  
-  .small-purple-planet {
-    position: absolute;
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background: linear-gradient(to bottom right, #d8b4fe, #7e22ce);
-    bottom: 15%;
-    left: 30%;
-    box-shadow: 0 0 20px 2px rgba(138, 79, 255, 0.2);
-  }
-  
-  .adventure-text {
-    position: absolute;
-    bottom: 64px;
-    left: 64px;
-    z-index: 10;
-  }
-  
-  .adventure-text h2 {
-    color: white;
-    font-size: 48px;
-    font-weight: bold;
-    line-height: 1.2;
-  }
-  
-  .adventure-text span {
-    color: #8a4fff;
-  }
-  
-  /* Right side - Form */
-  .form-container {
-    width: 40%;
-    background-color: #1e1e1e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-  }
-  
-  .form-content {
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .form-header h1 {
-    font-size: 48px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 32px;
-  }
-  
-  .form-header p {
-    font-size: 14px;
-    color: #d1d5db;
-    margin-bottom: 16px;
-  }
-  
-  .form-group {
-    margin-bottom: 24px;
-  }
-  
-  .input-wrapper {
-    position: relative;
-  }
-  
-  .email-icon {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #d1d5db;
-  }
-  
-  .email-input {
-    width: 100%;
-    background-color: #5e1e9d;
-    color: white;
-    padding: 12px 12px 12px 40px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-  }
-  
-  .email-input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .email-input:focus {
-    box-shadow: 0 0 0 2px rgba(138, 79, 255, 0.5);
-  }
-  
-  .signup-button {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 6px;
-    color: white;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(to right, #8a4fff, #3b82f6);
-    transition: all 0.3s ease;
-  }
-  
-  .signup-button:hover {
-    background: linear-gradient(to right, #7c3aed, #2563eb);
-  }
-  
-  .signup-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px rgba(138, 79, 255, 0.5);
-  }
-  
-  .signup-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .divider {
-    position: relative;
-    margin: 24px 0;
-  }
-  
-  .divider-line {
-    width: 100%;
-    height: 1px;
-    background-color: #4b5563;
-  }
-  
-  .divider-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #1e1e1e;
-    padding: 0 8px;
-    color: #9ca3af;
-    font-size: 14px;
-  }
-  
-  .social-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 24px;
-  }
-  
-  .google-button,
-  .facebook-button {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 12px 16px;
-    border-radius: 6px;
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .google-button {
-    background-color: #8a4fff;
-  }
-  
-  .google-button:hover {
-    background-color: #7c3aed;
-  }
-  
-  .facebook-button {
-    background-color: #2563eb;
-  }
-  
-  .facebook-button:hover {
-    background-color: #1d4ed8;
-  }
-  
-  .social-icon {
-    margin-right: 8px;
-  }
-  
-  .terms-text {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
-  
-  .terms-link {
-    color: #a78bfa;
-    text-decoration: none;
-  }
-  
-  .terms-link:hover {
-    color: #c4b5fd;
-    text-decoration: underline;
-  }
-  
-  /* Animations */
-  @keyframes twinkle {
-    0%,
-    100% {
-      opacity: 0.2;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-  
-  @keyframes shootingstar {
-    0% {
-      transform: translateX(0) translateY(0);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    20% {
-      transform: translateX(100px) translateY(100px);
-      opacity: 0;
-    }
-    100% {
-      transform: translateX(100px) translateY(100px);
-      opacity: 0;
-    }
-  }
-  
-  
+}
+
