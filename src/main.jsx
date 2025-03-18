@@ -1,10 +1,23 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import React from "react"
+import ReactDOM from "react-dom/client"
+import "./styles/SignIn.css"
+import App from "./App.jsx"
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const root = document.getElementById("root");
+
+try {
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} catch (error) {
+  console.error("Failed to render app:", error);
+  root.innerHTML = `
+    <div style="padding: 20px; color: red;">
+      <h2>Failed to load application</h2>
+      <p>Check the console for more details.</p>
+      <pre>${error.message}</pre>
+    </div>
+  `;
+}
