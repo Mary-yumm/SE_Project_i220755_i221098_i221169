@@ -29,11 +29,35 @@ export default function HomePage() {
     }
   };
 
+const navigate_to_profile = async ()=>{
+  try {
+    navigate("/Profile"); // Redirect to profile page
+  } catch (error) {
+    console.error("Logout Error:", error);
+  }
+};
+
   return (
+    
     <div className="home-container">
+       <div className="icon_bar">
+
+          <img
+            src="src/assets/profile_icon.png"
+            alt="Profile"
+            className="profile_icon"
+            onClick={navigate_to_profile}
+          />
+       <button className="logout-btn" onClick={handleLogout}>Logout</button>
+
+        </div>
+
       <h1>Welcome to BrainByte! 🚀</h1>
+      <div className="user_email">
       {user && <p>Logged in as: <strong>{user.email}</strong></p>}
-      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
+      
+     
     </div>
   );
 }

@@ -18,6 +18,7 @@ export default function LandingPage() {
           <Link to="/SignUp" className="home-button signup-button">
             Sign Up
           </Link>
+        
         </div>
       </div>
     </div>
