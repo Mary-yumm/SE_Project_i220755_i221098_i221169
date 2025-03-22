@@ -4,13 +4,20 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import "../styles/SignIn.css"
 
-export default function BrainByteSignInPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+export default function BrainByteSignUpPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    age: "",
+    experience: "beginner",
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [codeParticles, setCodeParticles] = useState([])
   const [matrixRain, setMatrixRain] = useState([])
   const [showPassword, setShowPassword] = useState(false)
+  const [passwordMatch, setPasswordMatch] = useState(true)
 
   useEffect(() => {
     // Generate code particles
@@ -43,6 +50,13 @@ export default function BrainByteSignInPage() {
     }
     setMatrixRain(generatedRain)
   }, [])
+
+  useEffect(() => {
+    // Check if passwords match
+    if (formData.confirmPassword) {
+      setPasswordMatch(formData.password === formData.confirmPassword)
+    }
+  }, [formData.password, formData.confirmPassword])
 
   const getRandomCodeSymbol = () => {
     const symbols = [
@@ -95,12 +109,12 @@ export default function BrainByteSignInPage() {
     return colors[Math.floor(Math.random() * colors.length)]
   }
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value)
-  }
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value)
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value,
+    })
   }
 
   const togglePasswordVisibility = () => {
@@ -109,12 +123,18 @@ export default function BrainByteSignInPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordMatch(false)
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Sign in with:", email, password)
+      console.log("Sign up data:", formData)
     } catch (error) {
       console.error("Error:", error)
     } finally {
@@ -178,25 +198,54 @@ export default function BrainByteSignInPage() {
         {/* Text overlay at the bottom */}
         <div className="escape-text">
           <h2>
-            SIGN IN TO
+            JOIN THE
             <br />
-            <span>ESCAPE THE CODE</span>
+            <span>CODE BREAKERS</span>
           </h2>
-          <p>Solve puzzles. Break the locks. Debug your way out.</p>
+          <p>Create your profile and start solving the most challenging coding puzzles.</p>
         </div>
       </div>
 
       {/* Right side - Form */}
       <div className="form-container">
-        <div className="form-content">
+        <div className="form-content signup-form-content">
           <div className="form-header">
             <h1>
-              ACCESS <span className="highlight">BRAINBYTE</span>
+              CREATE <span className="highlight">ACCOUNT</span>
             </h1>
-            <p>Sign in with your credentials to begin</p>
+            <p>Sign up to start your coding escape adventure</p>
           </div>
 
           <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <div className="input-wrapper">
+                <div className="input-icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Full Name"
+                  required
+                />
+              </div>
+            </div>
+
             <div className="form-group">
               <div className="input-wrapper">
                 <div className="input-icon">
@@ -213,10 +262,11 @@ export default function BrainByteSignInPage() {
                 </div>
                 <input
                   type="email"
-                  value={email}
-                  onChange={handleEmailChange}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   className="form-input"
-                  placeholder="user@brainbyte.io"
+                  placeholder="Email Address"
                   required
                 />
               </div>
@@ -241,8 +291,9 @@ export default function BrainByteSignInPage() {
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={handlePasswordChange}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   className="form-input"
                   placeholder="Password"
                   required
@@ -286,59 +337,117 @@ export default function BrainByteSignInPage() {
                   )}
                 </button>
               </div>
-              <div className="forgot-password">
-                <a href="#" className="forgot-link">
-                  Forgot password?
-                </a>
+            </div>
+
+            <div className="form-group">
+              <div className="input-wrapper">
+                <div className="input-icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className={`form-input ${!passwordMatch ? "input-error" : ""}`}
+                  placeholder="Confirm Password"
+                  required
+                />
+              </div>
+              {!passwordMatch && <div className="error-message">Passwords do not match</div>}
+            </div>
+
+            <div className="form-row">
+              <div className="form-group half-width">
+                <div className="input-wrapper">
+                  <div className="input-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Age"
+                    min="13"
+                    max="120"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group half-width">
+                <div className="select-wrapper">
+                  <div className="input-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <select
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                    className="form-select"
+                    required
+                  >
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <button type="submit" disabled={isSubmitting} className="signup-button">
-              {isSubmitting ? "AUTHENTICATING..." : "ENTER THE GAME"}
+            <button type="submit" disabled={isSubmitting || !passwordMatch} className="signup-button">
+              {isSubmitting ? "CREATING ACCOUNT..." : "JOIN THE CHALLENGE"}
             </button>
           </form>
 
-          <div className="divider">
-            <div className="divider-line"></div>
-            <span className="divider-text">Or continue with</span>
-          </div>
-
-          <div className="social-buttons">
-            <button type="button" className="google-button">
-              <span className="social-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </span>
-              Google
-            </button>
-
-            <button type="button" className="facebook-button">
-              <span className="social-icon">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    fillRule="evenodd"
-                    d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-              Facebook
-            </button>
-          </div>
-
           <div className="account-prompt">
-            Don't have an account?{" "}
-            <Link to="/SignUp" className="account-link">
-              Sign up now
+            Already have an account?{" "}
+            <Link to="/SignIn" className="account-link">
+              Sign in here
             </Link>
           </div>
 
           <div className="terms-text">
-            By signing in you agree to our{" "}
+            By signing up you agree to our{" "}
             <a href="#" className="terms-link">
               Terms and Conditions
             </a>

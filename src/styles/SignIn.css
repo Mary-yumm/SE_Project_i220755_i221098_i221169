@@ -22,7 +22,7 @@ body {
 .code-background {
   width: 60%;
   position: relative;
-  background-color: #0d1117;
+  background-color: var(--background);
   overflow: hidden;
 }
 
@@ -53,7 +53,7 @@ body {
 }
 
 .matrix-character {
-  color: #8b5cf6;
+  color: var(--primary);
   font-size: 14px;
   opacity: 0;
   animation: fade-in 0.5s forwards;
@@ -67,19 +67,19 @@ body {
 }
 
 .escape-text h2 {
-  color: white;
+  color: var(--foreground);
   font-size: 48px;
   font-weight: bold;
   line-height: 1.2;
 }
 
 .escape-text span {
-  color: #a78bfa;
+  color: var(--accent);
   text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
 }
 
 .escape-text p {
-  color: #ddd;
+  color: var(--muted-foreground);
   font-size: 18px;
   margin-top: 12px;
   max-width: 400px;
@@ -88,11 +88,12 @@ body {
 /* Right side - Form */
 .form-container {
   width: 40%;
-  background-color: #161b22;
+  background-color: var(--card);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px;
+  overflow-y: auto;
 }
 
 .form-content {
@@ -100,22 +101,26 @@ body {
   max-width: 400px;
 }
 
+.signup-form-content {
+  padding: 20px 0;
+}
+
 .form-header h1 {
   font-size: 48px;
   font-weight: bold;
-  color: white;
+  color: var(--foreground);
   margin-bottom: 32px;
   font-family: "Fira Code", monospace;
 }
 
 .highlight {
-  color: #a78bfa;
+  color: var(--accent);
   text-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
 }
 
 .form-header p {
   font-size: 14px;
-  color: #d1d5db;
+  color: var(--muted-foreground);
   margin-bottom: 16px;
 }
 
@@ -123,61 +128,159 @@ body {
   margin-bottom: 24px;
 }
 
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.half-width {
+  width: 50%;
+  margin-bottom: 0;
+}
+
 .input-wrapper {
   position: relative;
 }
 
-.email-icon {
+.input-icon {
   position: absolute;
   top: 50%;
   left: 12px;
   transform: translateY(-50%);
-  color: #d1d5db;
+  color: var(--muted-foreground);
 }
 
-.email-input {
+.form-input {
   width: 100%;
-  background-color: #0d1117;
-  color: white;
+  background-color: var(--input);
+  color: var(--foreground);
   padding: 12px 12px 12px 40px;
   border-radius: 6px;
-  border: 1px solid #30363d;
+  border: 1px solid var(--border);
   outline: none;
   font-size: 16px;
   font-family: "Fira Code", monospace;
 }
 
-.email-input::placeholder {
+.form-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.email-input:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.input-error {
+  border-color: var(--destructive);
+}
+
+.input-error:focus {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.error-message {
+  color: var(--destructive);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.form-select {
+  width: 100%;
+  background-color: var(--input);
+  color: var(--foreground);
+  padding: 12px 12px 12px 40px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  outline: none;
+  font-size: 16px;
+  font-family: "Fira Code", monospace;
+  appearance: none;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--muted-foreground);
+  pointer-events: none;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: var(--accent);
+}
+
+.forgot-password {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.forgot-link {
+  color: var(--accent);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  color: var(--accent-foreground);
 }
 
 .signup-button {
   width: 100%;
   padding: 12px 16px;
   border-radius: 6px;
-  color: white;
+  color: var(--primary-foreground);
   font-weight: 500;
   border: none;
   cursor: pointer;
-  background: linear-gradient(to right, #8b5cf6, #6d28d9);
+  background: linear-gradient(to right, var(--primary), var(--secondary));
   transition: all 0.3s ease;
   font-family: "Fira Code", monospace;
   letter-spacing: 1px;
 }
 
 .signup-button:hover {
-  background: linear-gradient(to right, #a78bfa, #7c3aed);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+  background: linear-gradient(to right, var(--accent), var(--primary));
+  box-shadow: 0 0 15px var(--ring);
 }
 
 .signup-button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #161b22, 0 0 0 4px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--ring);
 }
 
 .signup-button:disabled {
@@ -193,7 +296,7 @@ body {
 .divider-line {
   width: 100%;
   height: 1px;
-  background-color: #30363d;
+  background-color: var(--border);
 }
 
 .divider-text {
@@ -201,9 +304,9 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #161b22;
+  background-color: var(--card);
   padding: 0 8px;
-  color: #9ca3af;
+  color: var(--muted-foreground);
   font-size: 14px;
 }
 
@@ -221,7 +324,7 @@ body {
   align-items: center;
   padding: 12px 16px;
   border-radius: 6px;
-  color: white;
+  color: var(--primary-foreground);
   font-size: 14px;
   font-weight: 500;
   border: none;
@@ -230,70 +333,102 @@ body {
 }
 
 .google-button {
-  background-color: #8b5cf6;
+  background-color: var(--primary);
 }
 
 .google-button:hover {
-  background-color: #7c3aed;
+  background-color: var(--secondary);
 }
 
 .facebook-button {
-  background-color: #6d28d9;
+  background-color: var(--secondary);
 }
 
 .facebook-button:hover {
-  background-color: #5b21b6;
+  background-color: var(--secondary);
+  filter: brightness(0.9);
 }
 
 .social-icon {
   margin-right: 8px;
 }
 
-.terms-text {
+.account-prompt {
   text-align: center;
   margin-top: 24px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+}
+
+.account-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.account-link:hover {
+  text-decoration: underline;
+  color: var(--accent-foreground);
+}
+
+.terms-text {
+  text-align: center;
+  margin-top: 16px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--muted-foreground);
 }
 
 .terms-link {
-  color: #a78bfa;
+  color: var(--accent);
   text-decoration: none;
 }
 
 .terms-link:hover {
-  color: #c4b5fd;
+  color: var(--accent-foreground);
   text-decoration: underline;
 }
 
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.2;
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .brainbyte-container {
+    flex-direction: column;
   }
-  50% {
-    transform: translateY(-10px);
-    opacity: 0.8;
+
+  .code-background,
+  .form-container {
+    width: 100%;
+  }
+
+  .code-background {
+    height: 40vh;
+  }
+
+  .escape-text {
+    bottom: 20px;
+    left: 20px;
+  }
+
+  .escape-text h2 {
+    font-size: 36px;
+  }
+
+  .escape-text p {
+    font-size: 16px;
   }
 }
 
-@keyframes matrix-fall {
-  0% {
-    transform: translateY(-100%);
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    gap: 24px;
   }
-  100% {
-    transform: translateY(1000px);
-  }
-}
 
-@keyframes fade-in {
-  0% {
-    opacity: 0;
+  .half-width {
+    width: 100%;
   }
-  100% {
-    opacity: 0.8;
+
+  .form-header h1 {
+    font-size: 36px;
   }
 }
 
