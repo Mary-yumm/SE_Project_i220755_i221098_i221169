@@ -1,16 +1,21 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import "../styles/SignIn.css"
+import { signInWithEmailAndPassword } from "firebase/auth"; // Use correct function
+import { auth } from "../utils/firebase"; // Import Firebase auth
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export default function BrainByteSignInPage() {
+  const navigate = useNavigate(); // Initialize navigation
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [codeParticles, setCodeParticles] = useState([])
   const [matrixRain, setMatrixRain] = useState([])
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState(null);
+
 
   useEffect(() => {
     // Generate code particles
@@ -108,19 +113,25 @@ export default function BrainByteSignInPage() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null); // Reset error before submitting
+    console.log("Attempting sign-in...");
+
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Sign in with:", email, password)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Signed in:", userCredential.user);
+
+      // Redirect to homepage or dashboard after successful sign-in
+      navigate("/Home");
     } catch (error) {
-      console.error("Error:", error)
+      console.error("Error signing in:", error.message);
+      setError("Invalid email or password");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="brainbyte-container">

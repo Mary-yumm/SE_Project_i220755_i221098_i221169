@@ -3,6 +3,7 @@ import LandingPage from "./components/WelcomePage";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Layout from "./components/layout";
+import HomePage from "./components/HomePage";
 import "./styles/global.css"; // Import global styles
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/SignUp" element={<SignUp />} />
+          <Route path="/Home" element={<HomePage />} /> 
         </Routes>
       </Layout>
     </Router>
