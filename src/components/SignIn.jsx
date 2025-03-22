@@ -2,8 +2,9 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import "../styles/SignIn.css"
 import { signInWithEmailAndPassword } from "firebase/auth"; // Use correct function
-import { auth } from "../utils/firebase"; // Import Firebase auth
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { auth, googleProvider, signInWithPopup } from "../utils/firebase";
+
 
 export default function BrainByteSignInPage() {
   const navigate = useNavigate(); // Initialize navigation
@@ -130,6 +131,17 @@ export default function BrainByteSignInPage() {
       setError("Invalid email or password");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google Sign-In:", result.user);
+      navigate("/Home"); // Redirect after Google login
+    } catch (error) {
+      console.error("Google Sign-In Error:", error.message);
+      setError("Failed to sign in with Google");
     }
   };
 
@@ -315,7 +327,7 @@ export default function BrainByteSignInPage() {
           </div>
 
           <div className="social-buttons">
-            <button type="button" className="google-button">
+            <button type="button" className="google-button" onClick={handleGoogleSignIn}>
               <span className="social-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path
