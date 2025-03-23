@@ -6,6 +6,8 @@
     align-items: center;
     height: 100vh;
     width: 100%; 
+    min-width: 800px;
+
   }
   .logout-btn {
     background-color: var(--background);
@@ -21,29 +23,14 @@
   .logout-btn:hover {
     background-color:rgb(52, 49, 67);
   }
-  
-.icon-bar{
-    display:flex;
-    flex-direction: row;
-    position: absolute;
-    top: 4%;
-    right: 2%;
-    height: max-content;
-}
-.home_icon{
-    width:40px;
-    height: 40px;
-    border-radius: 50%;
-}
-.home_icon:hover{
-    background-color: rgb(81, 13, 155);
-}
+
 .certificate-body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 70vh;
-    width: 60%;
+    width: 100%;
+    max-width: 900px;
     background-color: rgb(244, 241, 249);
     padding: 10px; /* Space inside border */
   
@@ -52,6 +39,7 @@
 .certificate-content {
     height: 100%;
     width: 100%;
+    min-width: 700px;
     padding-top: 30px; 
     text-align: center;
     color: black;
@@ -135,3 +123,25 @@ margin:  auto;
     width: 150px;
     height: 150px;
 }
+
+.home-btn:hover {
+    background-color: #4b0a73;
+    transform: translateY(1px); /* Slight lift effect */
+  }
+
+  .home-btn {
+    position: absolute; /* Keeps it next to the container */
+    background-color: #380757;
+    left: 70px; /* Moves it to the left of the container */
+    top: 8%; /* Centers vertically */
+    transform: translateY(10%); /* Ensures perfect vertical centering */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Fira Code', monospace;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+  }
