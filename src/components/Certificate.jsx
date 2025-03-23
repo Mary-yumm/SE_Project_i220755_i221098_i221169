@@ -44,7 +44,7 @@ export default function Certificate() {
     <div className="certificate-page-container">
       <div className="icon-bar">
         <img
-          src="src/assets/profile_icon.png"
+          src="src/assets/home.png"
           alt="Profile"
           className="home_icon"
           onClick={navigateToHome}
