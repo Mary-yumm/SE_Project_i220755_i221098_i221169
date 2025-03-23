@@ -1,42 +1,220 @@
+.logout-container {
+  position: absolute;
+  bottom: 10px; /* Positioned near the bottom */
+  right: 15px; /* Positioned to the right */
+  display: flex;
+  flex-direction: column; /* Stack email above logout */
+  align-items: flex-end; /* Align to the right */
+  gap: 10px; 
+}
+button {
+  border: none;
+  padding: 6px 12px; /* Reduced height */
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+/* Darker and modern buttons */
+.settings-btn,
+.leaderboard-btn,
+.profile-btn,
+.logout-btn {
+  background-color: #2a0c4e; /* Dark purple */
+  color: white;
+  padding: 6px 14px; /* Shorter and sleek */
+  font-size: 13px; /* Slightly smaller */
+  border-radius: 6px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); /* Soft shadow */
+}
+.settings-btn:hover,
+.leaderboard-btn:hover,
+.profile-btn:hover,
+.logout-btn:hover {
+  background-color: #1c072e; /* Even darker on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+.logout-btn {
+  background-color: var(--background);
+  color: var(--primary);
+  border: none;
+  padding: 10px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  margin-right: 14px; /* Slightly adjusted */
+  width: 110px; /* More compact */  font-family: 'Fira Code', monospace;
+}
+
+.logout-btn:hover {
+  background-color: rgb(52, 49, 67);
+}
+
+.user-email {
+  color: rgb(218, 194, 227);
+  font-size: 12px;
+  font-family: 'Fira Code', monospace;
+  text-align: right;
+  margin-bottom: 4px; /* More spacing from logout */
+}
+
+.settings-btn {
+  background-color: #4a148c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.leaderboard-btn {
+  background-color: #4a148c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.profile-btn {
+  background-color: #4a148c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.settings-btn:hover {
+  background-color: #6a1b9a;
+}
+.profile-btn:hover {
+  background-color: #6a1b9a;
+}
 .home-container {
-    text-align: center;
-    padding: 50px;
-    font-family: Arial, sans-serif;
-    position: relative;
-  }
-  
-  .logout-btn {
-    background-color: var(--background);
-    color: var(--primary);
-    border: none;
-    padding: 8px 10px;
-    margin-left: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .logout-btn:hover {
-    background-color:rgb(52, 49, 67);
-  }
-  
-  .profile_icon{
-    width:40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-  .profile_icon:hover{
-    background-color: rgb(81, 13, 155);
-  }
-  .icon_bar{
-    display:flex;
-    flex-direction: row;
-    position: absolute;
-    top: 4%;
-    right: 2%;
-  }
-  .user_email{
-    position: absolute;
-    bottom: 2%;
-    align-self: center;
-  }
+  width: 100vw;
+  max-width: 100%;
+  text-align: center;
+  padding: 50px;
+  font-family: Arial, sans-serif;
+  position: relative;
+  background: linear-gradient(to bottom, #090011, #1c072e);
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+}
+/* BrainByte Logo */
+.brainbyte-logo {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+ font-family: 'Fira Code', monospace;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  cursor: pointer;}
+
+/* User Info & Buttons */
+.icon-bar {
+  display: flex;
+  gap: 10px;
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  flex-direction: row;
+}
+.settings-btn,
+.leaderboard-btn,
+.logout-btn {
+  background-color: #4a148c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.settings-btn:hover,
+.leaderboard-btn:hover{
+  background-color: #6a1b9a;
+}
+
+/* User Name */
+.user-name {
+  color: rgb(218, 194, 227);
+  font-size: 20px;
+  font-family: 'Fira Code', monospace;
+  margin-top: 80px;
+  font-weight: semi-regular;
+
+}
+
+/* Levels Container */
+.levels-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  font-family: 'Fira Code', monospace;
+  font-size: 15px;
+  color: rgb(218, 194, 227);
+  margin-top: 50px;
+}
+
+.level {
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+.island-image {
+  width: 200px;
+  height: 250px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.island-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(218, 194, 227);
+  margin-bottom: 10px; /* Space between name and image */
+  transition: transform 0.3s ease;
+}
+
+.level:hover .island-image,
+.level:hover .island-name {
+  transform: scale(1.1);
+}
+.level-description {
+  font-size: 14px;
+  color: #ddd;
+  margin-top: 15px; /* Space between image and description */
+}
+.profile-icon {
+  font-size: 22px; /* Adjust size */
+  color: white; /* Set color */
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.profile-icon:hover {
+  color: #b38aff; /* Light purple on hover */
+}

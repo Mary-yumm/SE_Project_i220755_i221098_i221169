@@ -23,41 +23,91 @@ export default function HomePage() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/SignIn"); // Redirect to sign-in page
+      navigate("/SignIn");
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
 
-const navigate_to_profile = async ()=>{
-  try {
-    navigate("/Profile"); // Redirect to profile page
-  } catch (error) {
-    console.error("Logout Error:", error);
-  }
-};
+  const navigateToProfile = () => navigate("/Profile");
+  const navigateToSettings = () => navigate("/Setting");
+  const navigateToleaderboard = () => navigate("/leaderboard");
 
   return (
-    
     <div className="home-container">
-       <div className="icon_bar">
+      {/* Top Left: BrainByte Logo */}
+      <div className="brainbyte-logo">BrainByte</div>
 
+      {/* Top Right: User Info & Buttons */}
+      <div className="icon-bar">
+        <button className="profile-btn" onClick={navigateToProfile}>
+          <span className="profile-icon">👤</span> Profile
+        </button>
+
+        <button className="settings-btn" onClick={navigateToSettings}>
+          ⚙️ Settings
+        </button>
+        <button className="leaderboard-btn" onClick={navigateToleaderboard}>
+          🏆 leaderboard
+        </button>
+      </div>
+
+      {/* User's Name at the Top */}
+      {user && (
+        <h2 className="user-name">
+          Hello, {user.displayName || "Player"}
+          <span className="motto">
+            ! Embark on an Epic Journey and Conquer The Islands.
+          </span>
+        </h2>
+      )}
+
+      {/* Islands (Levels) */}
+      <div className="levels-container">
+        <div className="level" onClick={() => navigate("/level1")}>
+          <h3 className="island-name">Questoria</h3>
           <img
-            src="src/assets/profile_icon.png"
-            alt="Profile"
-            className="profile_icon"
-            onClick={navigate_to_profile}
+            src="src/assets/island01.webp"
+            alt="Level 1"
+            className="island-image"
           />
-       <button className="logout-btn" onClick={handleLogout}>Logout</button>
-
+          <p className="level-description">
+            Level 1 <br /> Begin your adventure here🌿
+          </p>
         </div>
 
-      <h1>Welcome to BrainByte! 🚀</h1>
-      <div className="user_email">
-      {user && <p>Logged in as: <strong>{user.email}</strong></p>}
+        <div className="level" onClick={() => navigate("/level2")}>
+          <h3 className="island-name">Frosthaven</h3>
+          <img
+            src="src/assets/island2.jpg"
+            alt="Level 2"
+            className="island-image"
+          />
+          <p className="level-description">
+            Level 2 <br /> Survive the frozen lands❄️
+          </p>
+        </div>
+
+        <div className="level" onClick={() => navigate("/level3")}>
+          <h3 className="island-name">Embervale</h3>
+          <img
+            src="src/assets/island03.png"
+            alt="Level 3"
+            className="island-image"
+          />
+          <p className="level-description">
+            Level 3 <br /> Face the fire realm🔥
+          </p>
+        </div>
       </div>
-      
-     
+
+      {/* Bottom right: Logout Button & Email */}
+      <div className="logout-container">
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+        {user && <p className="user-email">{user.email}</p>}
+      </div>
     </div>
   );
 }
