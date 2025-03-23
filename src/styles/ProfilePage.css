@@ -1,47 +1,143 @@
-.profile-container {
-    text-align: center;
-    font-family: Arial, sans-serif;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
+body {
+    margin: 0;
+    padding: 0;
     height: 100vh;
+    background: linear-gradient(to bottom, #090011, #1c072e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  .logout-btn {
-    background-color: var(--background);
-    color: var(--primary);
+  
+  
+  .profile-container {
+    position: relative; /* Allows absolute positioning for Home Button */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content horizontally */
+    width: 90%; /* Increase width to take most of the screen */
+    max-width: 1200px; /* Allow expansion while keeping it reasonable */
+    margin: 50px auto; /* Center it vertically and horizontally */
+    padding: 30px; /* Add padding on all sides */
+    flex-wrap: wrap;
+    background: rgba(170, 141, 174, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    
+    color: white;
+    font-family: "Fira Code", monospace;
+}
+
+
+  .profile-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .profile-pic {
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #6a1b9a;
+  }
+  
+  .profile-right {
+    flex: 2;
+    padding-left: 20px;
+  }
+  
+  .profile-right input,
+  .profile-right select,
+  .profile-right textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #44475a;
+    background-color: #282a36;
+    color: #f8f8f2;
+    margin-top: 8px;
+  }
+  
+  .profile-right h2 {
+    color: #c792ea;
+  }
+  
+  @media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+        width: 95%;
+        padding: 20px;
+    }
+  
+    .profile-right {
+      padding-left: 0;
+    }
+  }
+ 
+  .home-btn:hover {
+    background-color: #4b0a73;
+    transform: translateY(1px); /* Slight lift effect */
+  }
+
+  .home-btn {
+    position: absolute; /* Keeps it next to the container */
+    background-color: #3f1a56;
+    left: 70px; /* Moves it to the left of the container */
+    top: 8%; /* Centers vertically */
+    transform: translateY(10%); /* Ensures perfect vertical centering */
+    color: white;
     border: none;
-    padding: 8px 10px;
-    margin-left: 5px;
+    padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 5px;
+    font-family: 'Fira Code', monospace;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
   }
-  
-  .logout-btn:hover {
-    background-color:rgb(52, 49, 67);
-  }
-  
-.profile-icon-bar{
-    display:flex;
-    flex-direction: row;
-    position: absolute;
-    top: 4%;
-    right: 2%;
-    height: max-content;
+
+  .change-avatar-btn {
+    position: absolute; /* Keeps it next to the container */
+    background-color: #3f1a56;
+    left: 129px; /* Moves it to the left of the container */
+    top: 82%; /* Centers vertically */
+    transform: translateY(10%); /* Ensures perfect vertical centering */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Fira Code', monospace;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
 }
-.home_icon{
-    width:40px;
-    height: 40px;
-    border-radius: 50%;
+
+.change-avatar-btn:hover {
+    background-color: #4b0a73;
+    transform: translateY(1px); /* Slight lift effect */
 }
-.home_icon:hover{
-    background-color: rgb(81, 13, 155);
+.view-certificate-btn {
+  background-color: #3f1a56;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: 'Fira Code', monospace;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+  margin-top: 15px;
+  width: 100%; /* Ensure it takes full width */
+  max-width: 800px; /* Adjust this value as needed */
+  margin: auto; /* Center it */
 }
-.profile-body{
-    vertical-align:middle;
-    position: absolute;
-    flex-direction: column;
-    align-self: center;
+
+.view-certificate-btn:hover {
+  background-color: #4b0a73;
+  transform: translateY(1px);
 }

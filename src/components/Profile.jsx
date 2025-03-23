@@ -1,98 +1,99 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../utils/firebase"; // Firebase authentication
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import "../styles/ProfilePage.css"; // Create a separate CSS file for the profile page
+import { auth } from "../utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import "../styles/ProfilePage.css";
+
+import avatar from "../assets/avatar1.avif";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // Check if user is logged in
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
+      if (!currentUser) {
+        navigate("/login"); // Redirect to login if not authenticated
       } else {
-        navigate("/SignIn"); // Redirect to SignIn if not logged in
+        setUser(currentUser);
       }
     });
-    return () => unsubscribe(); // Cleanup on unmount
+
+    return () => unsubscribe();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/SignIn"); // Redirect to sign-in page
-    } catch (error) {
-      console.error("Logout Error:", error);
-    }
-  };
+  const navigateToHome = () => navigate("/Home");
 
-  const navigateToHome = () => {
-    try {
-      navigate("/Home");
-    } catch (error) {
-      // Navigate back to home page
-      console.error("Logout Error:", error);
-    }
+  return (
+    <>
+      {/* Home Button Outside Profile Container */}
+      <button className="home-btn" onClick={navigateToHome}>
+        Home
+      </button>
+
+      {user ? <Profile user={user} /> : <p>Loading...</p>}
+    </>
+  );
+}
+
+function Profile({ user }) {
+  const navigate = useNavigate();
+  
+  const [displayName, setDisplayName] = useState(user.displayName || "John Doe");
+  const [bio, setBio] = useState("Aspiring Software Engineer");
+  const [language, setLanguage] = useState("JavaScript");
+  const [level, setLevel] = useState("Intermediate");
+  const [streak, setStreak] = useState(5);
+  const [challengesCompleted, setChallengesCompleted] = useState(120);
+  const [accuracyRate, setAccuracyRate] = useState(85);
+  const [leaderboardPosition, setLeaderboardPosition] = useState(10);
+  const [currencyBalance, setCurrencyBalance] = useState(500);
+
+  const changeAvatar = () => {
+    alert("Feature coming soon! 🎨");
   };
 
   const handleCertificateView = () => {
-    try {
-      navigate("/CertificatePage", {state: { username: user.displayName || "User" } });
-    } catch (error) {
-      // Navigate back to home page
-      console.error("Logout Error:", error);
-      print(error);
-    }
+    navigate("/CertificatePage", { state: { username: user.displayName || "User" } });
   };
+
   return (
     <div className="profile-container">
-      <div className="profile-icon-bar">
-        <img
-          src="src/assets/profile_icon.png"
-          alt="Profile"
-          className="home_icon"
-          onClick={navigateToHome}
-        />
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
+      <div className="profile-left">
+        <img src={avatar} alt="Profile" className="profile-pic" />
+        <button className="change-avatar-btn" onClick={changeAvatar}>
+          Change Avatar
         </button>
       </div>
-      <div className="profile-body">
-        <h1>User Profile</h1>
 
-        {user && (
-          <div className="profile-content">
-            <div className="profile-details">
-              <h2>Account Information</h2>
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p>
-                <strong>User ID:</strong> {user.uid}
-              </p>
-              {user.displayName && (
-                <p>
-                  <strong>Name:</strong> {user.displayName}
-                </p>
-              )}
-              <p>
-                <strong>Account created:</strong> {user.metadata.creationTime}
-              </p>
-              <p>
-                <strong>Last sign in:</strong> {user.metadata.lastSignInTime}
-              </p>
-              <button
-                className="view-certificate-btn"
-                onClick={handleCertificateView}
-              >
-                View Certificate
-              </button>
-            </div>
-          </div>
-        )}
+      <div className="profile-right">
+        <h2>Personal Information</h2>
+        <label>Display Name:</label>
+        <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+
+        <label>Bio:</label>
+        <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+
+        <label>Preferred Programming Language:</label>
+        <input type="text" value={language} onChange={(e) => setLanguage(e.target.value)} />
+
+        <label>Coding Proficiency Level:</label>
+        <select value={level} onChange={(e) => setLevel(e.target.value)}>
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Expert</option>
+        </select>
+
+        <h2>Activity & Progress Tracking</h2>
+        <p>Streak: {streak} days</p>
+        <p>Challenges Completed: {challengesCompleted}</p>
+        <p>Accuracy Rate: {accuracyRate}%</p>
+        <p>Leaderboard Position: #{leaderboardPosition}</p>
+        <p>In-Game Currency Balance: {currencyBalance} coins</p>
+
+        <button className="view-certificate-btn" onClick={handleCertificateView}>
+          View Certificate
+        </button>
       </div>
     </div>
   );
