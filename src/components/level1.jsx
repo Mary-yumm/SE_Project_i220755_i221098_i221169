@@ -4,6 +4,7 @@ import "../styles/level1.css";
 import questionsData from "../data/level1Data.json";
 import { completeLevel, updateCurrentLevel, updateUserScore, logActivity } from '../services/firebaseService';
 import { getAuth } from 'firebase/auth';
+import Level1Tutorial from './Level1Tutorial';
 
 // Add keyframes for blinking animation
 const blinkAnimation = `
@@ -40,6 +41,7 @@ export default function Level1() {
   const [memoryViolations, setMemoryViolations] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
@@ -258,6 +260,7 @@ export default function Level1() {
       overflow: 'hidden',
       backgroundColor: 'var(--background)'
     }}>
+      {showTutorial && <Level1Tutorial onComplete={() => setShowTutorial(false)} />}
       <style>{blinkAnimation}</style>
       <div className="level1-header" style={{ 
         position: 'absolute', 
@@ -330,6 +333,7 @@ export default function Level1() {
         <img 
           src="/assets/character.png" 
           alt="Character" 
+          className="player-character"
           style={{ 
             position: 'absolute',
             width: '60px',

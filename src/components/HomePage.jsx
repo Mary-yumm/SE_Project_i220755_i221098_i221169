@@ -4,11 +4,13 @@ import { auth } from "../utils/firebase"; // Firebase authentication
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { getUserProgress } from "../services/firebaseService";
 import "../styles/HomePage.css"; // Import styling
+import Tutorial from "./Tutorial";
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(true); // Always start with tutorial shown
   const navigate = useNavigate();
 
   // Check if user is logged in and fetch progress
@@ -29,6 +31,10 @@ export default function HomePage() {
     });
     return () => unsubscribe(); // Cleanup on unmount
   }, [navigate]);
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false);
+  };
 
   const handleLogout = async () => {
     try {
@@ -69,6 +75,9 @@ export default function HomePage() {
 
   return (
     <div className="home-container">
+      {/* Tutorial overlay */}
+      {showTutorial && <Tutorial onComplete={handleTutorialComplete} />}
+      
       {/* Top Left: BrainByte Logo */}
       <div className="brainbyte-logo">BrainByte</div>
 
