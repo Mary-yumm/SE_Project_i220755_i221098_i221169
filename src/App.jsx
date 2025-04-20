@@ -15,6 +15,8 @@ import Level2 from "./components/level2";
 import Level3 from "./components/level3";
 import { initializeUserProgress } from "./services/firebaseService";
 import Leaderboard from './components/Leaderboard';
+import AudioPlayer from './components/AudioPlayer';
+import { AudioProvider } from './context/AudioContext';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -55,79 +57,82 @@ function App() {
   }
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/SignUp" element={<SignUp />} />
-          <Route
-            path="/Home"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/Profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/Setting"
-            element={
-              <ProtectedRoute>
-                <SettingPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/Certificate"
-            element={
-              <ProtectedRoute>
-                <Certificate />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/level1"
-            element={
-              <ProtectedRoute>
-                <Level1 />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/level2"
-            element={
-              <ProtectedRoute>
-                <Level2 />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/level3"
-            element={
-              <ProtectedRoute>
-                <Level3 />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/leaderboard"
-            element={
-              <ProtectedRoute>
-                <Leaderboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Layout>
-    </Router>
+    <AudioProvider>
+      <Router>
+        <Layout>
+          <AudioPlayer />
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/SignIn" element={<SignIn />} />
+            <Route path="/SignUp" element={<SignUp />} />
+            <Route
+              path="/Home"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Setting"
+              element={
+                <ProtectedRoute>
+                  <SettingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Certificate"
+              element={
+                <ProtectedRoute>
+                  <Certificate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/level1"
+              element={
+                <ProtectedRoute>
+                  <Level1 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/level2"
+              element={
+                <ProtectedRoute>
+                  <Level2 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/level3"
+              element={
+                <ProtectedRoute>
+                  <Level3 />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute>
+                  <Leaderboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Layout>
+      </Router>
+    </AudioProvider>
   );
 }
 

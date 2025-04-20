@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../styles/SettingPage.css";
+import { useAudio } from '../context/AudioContext';
 
 export default function SettingPage() {
   const [theme, setTheme] = useState("dark");
   const [fontSize, setFontSize] = useState(16);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-
-  const navigate = useNavigate(); // ✅ Define navigate function
+  const { isPlaying, togglePlay } = useAudio();
+  const navigate = useNavigate();
 
   const handleSave = () => {
     alert("Settings Saved!");
     // You can store settings in localStorage or a database
   };
 
-  const navigateToHome = () => navigate("/Home"); // ✅ Ensure correct route
+  const navigateToHome = () => navigate("/Home");
 
   return (
     <>
@@ -49,13 +49,13 @@ export default function SettingPage() {
           <span>{fontSize}px</span>
         </div>
 
-        {/* Sound & Notifications */}
+        {/* Background Music */}
         <div className="setting-option">
-          <label>Sound:</label>
+          <label>Background Music:</label>
           <input
             type="checkbox"
-            checked={soundEnabled}
-            onChange={() => setSoundEnabled(!soundEnabled)}
+            checked={isPlaying}
+            onChange={togglePlay}
           />
         </div>
 
