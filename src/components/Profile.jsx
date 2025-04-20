@@ -44,15 +44,11 @@ function Profile({ user }) {
   const [loading, setLoading] = useState(true);
   const [userRank, setUserRank] = useState("Beginner");
   const [isUpdatingRank, setIsUpdatingRank] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   
   const [displayName, setDisplayName] = useState(user.displayName || "John Doe");
   const [bio, setBio] = useState("Aspiring Software Engineer");
   const [language, setLanguage] = useState("JavaScript");
-  const [streak, setStreak] = useState(5);
-  const [challengesCompleted, setChallengesCompleted] = useState(120);
-  const [accuracyRate, setAccuracyRate] = useState(85);
-  const [leaderboardPosition, setLeaderboardPosition] = useState(10);
-  const [currencyBalance, setCurrencyBalance] = useState(500);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -157,12 +153,79 @@ function Profile({ user }) {
           </button>
         </div>
 
-        <h2>Activity & Progress Tracking</h2>
-        <p>Streak: {streak} days</p>
-        <p>Challenges Completed: {challengesCompleted}</p>
-        <p>Accuracy Rate: {accuracyRate}%</p>
-        <p>Leaderboard Position: #{leaderboardPosition}</p>
-        <p>In-Game Currency Balance: {currencyBalance} coins</p>
+        <div className="stats-section">
+          <div className="stats-header">
+            <h2>Activity & Progress Tracking</h2>
+            <button 
+              className={`stats-toggle-btn ${showStats ? 'active' : ''}`}
+              onClick={() => setShowStats(!showStats)}
+            >
+              {showStats ? 'Hide Stats' : 'Show Stats'}
+            </button>
+          </div>
+          
+          {showStats && (
+            <div className="stats-container">
+              <div className="stats-category">
+                <h3>Performance</h3>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-label">Total Questions:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.totalQuestions || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Correct Answers:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.correctAnswers || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Incorrect Answers:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.incorrectAnswers || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Accuracy Rate:</span>
+                    <span className="stat-value">
+                      {userProgress?.progress?.stats?.totalQuestions 
+                        ? Math.round((userProgress.progress.stats.correctAnswers / userProgress.progress.stats.totalQuestions) * 100) 
+                        : 0}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stats-category">
+                <h3>Progress</h3>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-label">Time Spent:</span>
+                    <span className="stat-value">{Math.floor((userProgress?.progress?.stats?.timeSpent || 0) / 60)} minutes</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Perfect Levels:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.perfectLevels || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Total Points:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.totalPoints || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stats-category">
+                <h3>Challenges</h3>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-label">Memory Violations:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.memoryViolations || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Hints Used:</span>
+                    <span className="stat-value">{userProgress?.progress?.stats?.hintsUsed || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         <button className="view-certificate-btn" onClick={handleCertificateView}>
           View Certificate
