@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "levelId": "level1",
+    "levelName": "The Cave of C++",
+    "version": "1.0",
+    "createdAt": "2024-03-20",
+    "updatedAt": "2024-03-20",
+    "difficulty": "beginner",
+    "estimatedTime": 15,
+    "topics": ["templates", "pointers", "memory management", "polymorphism"]
+  },
+  "puzzles": {
+    "questions": [
+      {
+        "id": "q1",
+        "position": { "x": 2, "y": 2 },
+        "title": "The Shadows of Templates",
+        "narrative": "You enter a glowing cave. On a stone table are two magical doors: One only accepts items of the same type.\n\nYou find:\n🍎 A red apple marked 3\n🔮 A crystal marked 4.5",
+        "code": "template<typename T>\nT mystery(T a, T b) {\n    return (a > b) ? a : b;\n}\n\n// You try:\nmystery(3, 4.5);",
+        "question": "What happens when you try to use the magic word?",
+        "options": [
+          { "id": "a", "text": "The door sees both values and lets the bigger one through", "correct": false },
+          { "id": "b", "text": "The door stops — it needs both items to be of the same kind", "correct": true },
+          { "id": "c", "text": "The door mixes the items into something else", "correct": false },
+          { "id": "d", "text": "The door crashes with smoke", "correct": false }
+        ],
+        "feedback": {
+          "success": "Correct! Just like in C++ templates, the door (function) can't decide what type to use if the items (arguments) are different. So it refuses to open.",
+          "failure": "Incorrect. The door = template function. The two items = arguments. They must be the same type (both apples or both crystals) to work."
+        }
+      },
+      {
+        "id": "q2",
+        "position": { "x": 7, "y": 2 },
+        "title": "The Inferno of Pointers",
+        "narrative": "You walk into a cave filled with lava. On a stone platform sits a magic cube labeled a = 5.\n\nYou see three levers:\nLever 1 controls a rope (this is like pointer p to the cube)\nLever 2 is tied to the first lever (like pointer q to p)",
+        "code": "int a = 5;\nint* p = &a;\nint** q = &p;\n**q = 10;",
+        "question": "What happens when you pull Lever 2 all the way down?",
+        "options": [
+          { "id": "a", "text": "It directly changes the cube's value", "correct": true },
+          { "id": "b", "text": "It breaks the rope and nothing happens", "correct": false },
+          { "id": "c", "text": "The cube vanishes into lava", "correct": false },
+          { "id": "d", "text": "Only Lever 1 moves but the cube stays the same", "correct": false }
+        ],
+        "feedback": {
+          "success": "Correct! In C++, **q = 10; means: follow pointer q to pointer p, then change the value a. You pulled the top lever and it changed the cube below!",
+          "failure": "Incorrect. Cube = variable a, rope = pointer. You didn't touch the cube directly — you controlled it through ropes (pointers)."
+        }
+      },
+      {
+        "id": "q3",
+        "position": { "x": 4, "y": 4 },
+        "title": "The Frost of Memory",
+        "narrative": "You step into a frozen cave. On a crystal pedestal lies a scroll and a sealed chest made of ice shards.\n\nThe scroll reads:\nTo open the chest, melt all the shards you summoned... the same way they were created.",
+        "code": "char* p = new char[10];\nstrcpy(p, \"Questoria\");\ndelete p;",
+        "question": "What happens when you try to open the chest?",
+        "options": [
+          { "id": "a", "text": "The chest melts and reveals the treasure", "correct": false },
+          { "id": "b", "text": "Only one shard melts, the rest stay", "correct": false },
+          { "id": "c", "text": "You leave behind magical ice pieces", "correct": false },
+          { "id": "d", "text": "The chest reacts badly and cracks dangerously", "correct": true }
+        ],
+        "feedback": {
+          "success": "Correct! You used new[] to summon multiple shards (array), but delete melts only one. That's incorrect — it causes weird behavior.",
+          "failure": "Incorrect. The ice chest = array of characters. You summoned multiple (new[]) — but destroyed only one (delete) instead of all (delete[])."
+        }
+      },
+      {
+        "id": "q4",
+        "position": { "x": 9, "y": 9 },
+        "title": "The Final Trial – Polymorphix Abyss",
+        "narrative": "You reach the final chamber. In the center, a treasure chest floats in a magic bubble. Two statues stand beside it:\n\nOne says \"Base\"\nOne says \"Derived\"\n\nThey chant:\n\"To claim the treasure, clean up all that you summon. Start at the top, but don't forget what lies beneath.\"",
+        "code": "class Base {\npublic:\n    ~Base() { std::cout << \"Base destroyed\\n\"; }\n};\n\nclass Derived : public Base {\npublic:\n    ~Derived() { std::cout << \"Derived destroyed\\n\"; }\n};\n\nBase* b = new Derived();\ndelete b;",
+        "question": "What happens when you speak the magic words?",
+        "options": [
+          { "id": "a", "text": "Only the top statue (Base) was removed", "correct": true },
+          { "id": "b", "text": "Both statues vanish", "correct": false },
+          { "id": "c", "text": "The code fails to run", "correct": false },
+          { "id": "d", "text": "The room fills with ghost data", "correct": false }
+        ],
+        "feedback": {
+          "success": "Correct! You deleted the object using a Base pointer, but the Base destructor wasn't virtual. So Derived's cleanup never happened — treasure lost!",
+          "failure": "Incorrect. Statues = objects. If you want to fully destroy a Derived object through a Base pointer, you need a virtual destructor."
+        }
+      }
+    ]
+  },
+  "dialogue": {
+    "intro": [
+      "Welcome to the Cave of C++!",
+      "Here you'll face four challenging caves, each teaching you a different C++ concept.",
+      "Solve the puzzles in each cave to progress and claim the final treasure!",
+      "Remember: Each cave's story is tied to real C++ concepts. Pay attention to the details!"
+    ],
+    "completion": [
+      "Congratulations! You've conquered all four caves!",
+      "You've mastered templates, pointers, memory management, and polymorphism.",
+      "The final treasure is yours! Use these skills wisely in your C++ journey."
+    ]
+  },
+  "visualSettings": {
+    "colors": {
+      "primary": "#4CAF50",
+      "secondary": "#2196F3",
+      "background": "#1E1E1E",
+      "text": "#FFFFFF"
+    },
+    "animations": {
+      "transitionSpeed": 0.5,
+      "highlightDuration": 1.0
+    }
+  },
+  "penalty": {
+    "memoryViolation": {
+      "points": 10,
+      "maxViolations": 3,
+      "description": "Each memory violation costs 10 points. Exceeding 3 violations fails the level."
+    }
+  }
+} 

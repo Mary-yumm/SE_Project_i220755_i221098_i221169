@@ -2,20 +2,30 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebase"; // Firebase authentication
 import { signOut, onAuthStateChanged } from "firebase/auth";
+import { getUserProgress } from "../services/firebaseService";
 import "../styles/HomePage.css"; // Import styling
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
+  const [userProgress, setUserProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check if user is logged in
+  // Check if user is logged in and fetch progress
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+        try {
+          const progress = await getUserProgress();
+          setUserProgress(progress);
+        } catch (error) {
+          console.error("Error fetching user progress:", error);
+        }
       } else {
         navigate("/SignIn"); // Redirect to SignIn if not logged in
       }
+      setLoading(false);
     });
     return () => unsubscribe(); // Cleanup on unmount
   }, [navigate]);
@@ -32,6 +42,30 @@ export default function HomePage() {
   const navigateToProfile = () => navigate("/Profile");
   const navigateToSettings = () => navigate("/Setting");
   const navigateToleaderboard = () => navigate("/leaderboard");
+
+  const isLevelUnlocked = (levelId) => {
+    if (!userProgress) return levelId === 'level1'; // Only level 1 is unlocked by default
+    
+    // Check if previous level is completed
+    const levels = ['level1', 'level2', 'level3'];
+    const currentIndex = levels.indexOf(levelId);
+    
+    if (currentIndex === 0) return true; // Level 1 is always unlocked
+    
+    // Check if previous level is completed
+    const previousLevel = levels[currentIndex - 1];
+    return userProgress.progress?.completedLevels?.[previousLevel] === true;
+  };
+
+  const handleLevelClick = (levelPath) => {
+    if (isLevelUnlocked(levelPath.slice(1))) { // Remove the leading '/'
+      navigate(levelPath);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div className="home-container">
@@ -64,37 +98,70 @@ export default function HomePage() {
 
       {/* Islands (Levels) */}
       <div className="levels-container">
-        <div className="level" onClick={() => navigate("/level1")}>
+        <div 
+          className={`level ${isLevelUnlocked('level1') ? 'unlocked' : 'locked'}`}
+          onClick={() => handleLevelClick('/level1')}
+        >
           <h3 className="island-name">Questoria</h3>
-          <img
-            src="src/assets/island01.webp"
-            alt="Level 1"
-            className="island-image"
-          />
+          <div className="level-image-container">
+            <img
+              src="/assets/island01.webp"
+              alt="Level 1"
+              className="island-image"
+            />
+            {!isLevelUnlocked('level1') && (
+              <div className="lock-overlay">
+                <span className="lock-icon">🔒</span>
+              </div>
+            )}
+          </div>
           <p className="level-description">
             Level 1 <br /> Begin your adventure here🌿
           </p>
         </div>
 
-        <div className="level" onClick={() => navigate("/level2")}>
+        <div 
+          className={`level ${isLevelUnlocked('level2') ? 'unlocked' : 'locked'}`}
+          onClick={() => handleLevelClick('/level2')}
+        >
           <h3 className="island-name">Frosthaven</h3>
-          <img
-            src="src/assets/island2.jpg"
-            alt="Level 2"
-            className="island-image"
-          />
+          <div className="level-image-container">
+            <img
+              src="/assets/island2.jpg"
+              alt="Level 2"
+              className="island-image"
+            />
+            {!isLevelUnlocked('level2') && (
+              <div className="lock-overlay">
+                <span className="lock-icon">🔒</span>
+              </div>
+            )}
+          </div>
           <p className="level-description">
             Level 2 <br /> Survive the frozen lands❄️
           </p>
         </div>
 
-        <div className="level" onClick={() => navigate("/level3")}>
+        <div 
+          className={`level ${isLevelUnlocked('level3') ? 'unlocked' : 'locked'}`}
+          onClick={() => handleLevelClick('/level3')}
+        >
           <h3 className="island-name">Embervale</h3>
-          <img
-            src="src/assets/island03.png"
-            alt="Level 3"
-            className="island-image"
-          />
+          <div className="level-image-container">
+            <img
+              src="/assets/island03.PNG"
+              alt="Level 3"
+              className="island-image"
+            />
+            {!userProgress?.premium?.status && (
+              <div className="premium-badge">Premium</div>
+            )}
+            {!isLevelUnlocked('level3') && (
+              <div className="lock-overlay">
+                <span className="lock-icon">🔒</span>
+              </div>
+            )}
+          </div>
           <p className="level-description">
             Level 3 <br /> Face the fire realm🔥
           </p>

@@ -1,0 +1,168 @@
+{
+  "metadata": {
+    "levelId": "level2",
+    "levelName": "The Maze of Misplaced Memory",
+    "version": "1.0",
+    "createdAt": "2024-03-20",
+    "updatedAt": "2024-03-20",
+    "difficulty": "intermediate",
+    "estimatedTime": 15,
+    "topics": ["pointers", "memory management", "null safety", "pointer chains"]
+  },
+  "gameState": {
+    "initialState": {
+      "a": 5,
+      "p": null,
+      "lostVar": 99,
+      "q": null,
+      "r": null,
+      "currentPosition": "start"
+    },
+    "winCondition": {
+      "type": "reachExit",
+      "exitPosition": { "x": 18, "y": 11 }
+    }
+  },
+  "map": {
+    "layout": [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ],
+    "tileTypes": {
+      "wall": 1,
+      "floor": 0,
+      "question": 2,
+      "exit": 3
+    },
+    "dimensions": {
+      "width": 21,
+      "height": 13,
+      "tileSize": 64
+    }
+  },
+  "puzzles": {
+    "questions": [
+      {
+        "id": "q1",
+        "position": { "x": 8, "y": 5 },
+        "code": "int a = 5;",
+        "question": "You stand before a flickering symbol: &a. How do you properly initialize a pointer to it?",
+        "options": [
+          { "id": "a", "text": "int* p = &a;", "correct": true },
+          { "id": "b", "text": "int* p = a;", "correct": false }
+        ],
+        "feedback": {
+          "success": "Correct. Pointer initialized. The path ahead stabilizes.",
+          "failure": "Error: Cannot assign value directly to pointer. The floor flickers dangerously."
+        }
+      },
+      {
+        "id": "q2",
+        "position": { "x": 10, "y": 7 },
+        "code": "int* p = &a;",
+        "question": "The pointer p points to a. How do you change a's value through p?",
+        "options": [
+          { "id": "a", "text": "p = 10;", "correct": false },
+          { "id": "b", "text": "*p = 10;", "correct": true }
+        ],
+        "feedback": {
+          "success": "Correct! The value at address p is now 10. The path brightens.",
+          "failure": "Memory violation! Cannot assign integer directly to pointer. The walls glitch."
+        }
+      },
+      {
+        "id": "q3",
+        "position": { "x": 14, "y": 9 },
+        "code": "int* q = nullptr;",
+        "question": "You feel a cold void. This pointer leads nowhere. What's the safe way to handle it?",
+        "options": [
+          { "id": "a", "text": "*q = 10;", "correct": false },
+          { "id": "b", "text": "if (q != nullptr) *q = 10;", "correct": true }
+        ],
+        "feedback": {
+          "success": "Clever. Null checked. The void stabilizes into a path.",
+          "failure": "Segmentation Fault! The void consumes you. Memory violation detected."
+        }
+      },
+      {
+        "id": "q4",
+        "position": { "x": 8, "y": 11 },
+        "code": "int lostVar = 99;\nint* r = &lostVar;",
+        "question": "You've found lostVar, but its value is unstable. Restore it using the pointer chain.",
+        "options": [
+          { "id": "a", "text": "r = *p + 5;", "correct": false },
+          { "id": "b", "text": "*r = *p + 5;", "correct": true }
+        ],
+        "feedback": {
+          "success": "Memory stabilized! lostVar = 15. The final door unlocks.",
+          "failure": "Invalid pointer assignment! The memory corruption spreads."
+        }
+      }
+    ]
+  },
+  "dialogue": {
+    "intro": [
+      "Memory Leak Detected.",
+      "A pointer has gone rogue.",
+      "Rebuild the path, or be trapped forever.",
+      "",
+      "You are inside the RAMscape —",
+      "a digital maze formed by memory cells.",
+      "Some addresses are safe.",
+      "Others... corrupted."
+    ],
+    "completion": [
+      "Memory stabilized.",
+      "The lost variable has been restored.",
+      "",
+      "You've mastered pointer navigation",
+      "and fixed the memory leak!",
+      "",
+      "Proceed to Level 3."
+    ]
+  },
+  "visualSettings": {
+    "colors": {
+      "primary": "#00ffff",
+      "background": "#0a0a1c",
+      "floor": "#1a1a2e",
+      "grid": "#203050",
+      "success": "#00ff00",
+      "error": "#ff0000",
+      "glitch": "#ff00ff"
+    },
+    "tileSize": 64,
+    "playerScale": 0.8,
+    "animations": {
+      "transitionDuration": 500,
+      "shakeIntensity": 0.02,
+      "flashDuration": 500,
+      "glitchDuration": 300
+    }
+  },
+  "penalty": {
+    "stepsBack": 2,
+    "message": "Memory Violation! Moved back 2 steps!",
+    "effect": {
+      "type": "glitch",
+      "particles": {
+        "speed": { "min": -150, "max": 150 },
+        "angle": { "min": 0, "max": 360 },
+        "scale": { "start": 0.3, "end": 0 },
+        "lifespan": 400,
+        "quantity": 15
+      }
+    }
+  }
+} 
