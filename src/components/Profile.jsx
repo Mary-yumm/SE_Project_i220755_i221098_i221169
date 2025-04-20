@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getUserProgress, updatePremiumStatus } from "../services/firebaseService";
 import "../styles/ProfilePage.css";
 
 import avatar from "../assets/avatar1.avif";
@@ -38,6 +39,9 @@ export default function ProfilePage() {
 
 function Profile({ user }) {
   const navigate = useNavigate();
+  const [userProgress, setUserProgress] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
   
   const [displayName, setDisplayName] = useState(user.displayName || "John Doe");
   const [bio, setBio] = useState("Aspiring Software Engineer");
@@ -49,13 +53,46 @@ function Profile({ user }) {
   const [leaderboardPosition, setLeaderboardPosition] = useState(10);
   const [currencyBalance, setCurrencyBalance] = useState(500);
 
+  useEffect(() => {
+    const fetchUserProgress = async () => {
+      try {
+        const progress = await getUserProgress();
+        setUserProgress(progress);
+        setIsPremium(progress?.premium?.status || false);
+      } catch (error) {
+        console.error("Error fetching user progress:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProgress();
+  }, []);
+
+  const handlePremiumToggle = async () => {
+    try {
+      const newStatus = !isPremium;
+      await updatePremiumStatus(newStatus);
+      setIsPremium(newStatus);
+      // Show success message
+      alert(`Premium status ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+    } catch (error) {
+      console.error("Error updating premium status:", error);
+      alert("Failed to update premium status. Please try again.");
+    }
+  };
+
   const changeAvatar = () => {
     alert("Feature coming soon! 🎨");
   };
 
   const handleCertificateView = () => {
-    navigate("/CertificatePage", { state: { username: user.displayName || "User" } });
+    navigate("/Certificate", { state: { username: user.displayName || "User" } });
   };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div className="profile-container">
@@ -83,6 +120,17 @@ function Profile({ user }) {
           <option>Intermediate</option>
           <option>Expert</option>
         </select>
+
+        <h2>Premium Status</h2>
+        <div className="premium-toggle">
+          <span>Premium Account: {isPremium ? 'Active' : 'Inactive'}</span>
+          <button 
+            className={`premium-toggle-btn ${isPremium ? 'premium-active' : ''}`}
+            onClick={handlePremiumToggle}
+          >
+            {isPremium ? 'Deactivate Premium' : 'Activate Premium'}
+          </button>
+        </div>
 
         <h2>Activity & Progress Tracking</h2>
         <p>Streak: {streak} days</p>

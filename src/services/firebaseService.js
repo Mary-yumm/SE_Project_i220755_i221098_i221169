@@ -366,6 +366,30 @@ export const updateLeaderboard = async (score) => {
   }
 };
 
+// Update premium status
+export const updatePremiumStatus = async (status) => {
+  try {
+    const userRef = getUserRef();
+    const expiryDate = status ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null; // 30 days from now if premium
+    
+    await update(userRef, {
+      'premium/status': status,
+      'premium/expiryDate': expiryDate,
+      'premium/features': {
+        advancedLessons: status,
+        customThemes: status,
+        noAds: status,
+        prioritySupport: status
+      }
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating premium status:', error);
+    throw error;
+  }
+};
+
 // Helper function for incrementing values
 const increment = (delta) => {
   return {

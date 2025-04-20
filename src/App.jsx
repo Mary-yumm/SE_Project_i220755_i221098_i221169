@@ -85,7 +85,7 @@ function App() {
             }
           />
           <Route
-            path="/CertificatePage"
+            path="/Certificate"
             element={
               <ProtectedRoute>
                 <Certificate />
