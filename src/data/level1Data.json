@@ -27,7 +27,8 @@
         "feedback": {
           "success": "Correct! Just like in C++ templates, the door (function) can't decide what type to use if the items (arguments) are different. So it refuses to open.",
           "failure": "Incorrect. The door = template function. The two items = arguments. They must be the same type (both apples or both crystals) to work."
-        }
+        },
+        "hint": "In C++ templates, both arguments must be of the same type. The function can't work with mixed types like an integer and a float."
       },
       {
         "id": "q2",
@@ -45,7 +46,8 @@
         "feedback": {
           "success": "Correct! In C++, **q = 10; means: follow pointer q to pointer p, then change the value a. You pulled the top lever and it changed the cube below!",
           "failure": "Incorrect. Cube = variable a, rope = pointer. You didn't touch the cube directly — you controlled it through ropes (pointers)."
-        }
+        },
+        "hint": "Double pointers (**q) can access the value they point to by following the chain: first to the pointer (p), then to the value (a)."
       },
       {
         "id": "q3",
@@ -63,7 +65,8 @@
         "feedback": {
           "success": "Correct! You used new[] to summon multiple shards (array), but delete melts only one. That's incorrect — it causes weird behavior.",
           "failure": "Incorrect. The ice chest = array of characters. You summoned multiple (new[]) — but destroyed only one (delete) instead of all (delete[])."
-        }
+        },
+        "hint": "When you allocate an array with new[], you must use delete[] to free all the memory. Using just delete will only free the first element."
       },
       {
         "id": "q4",
@@ -81,7 +84,8 @@
         "feedback": {
           "success": "Correct! You deleted the object using a Base pointer, but the Base destructor wasn't virtual. So Derived's cleanup never happened — treasure lost!",
           "failure": "Incorrect. Statues = objects. If you want to fully destroy a Derived object through a Base pointer, you need a virtual destructor."
-        }
+        },
+        "hint": "When deleting a derived class through a base class pointer, the base class destructor must be virtual to ensure the derived destructor is called."
       }
     ]
   },
@@ -124,6 +128,7 @@
     },
     "levelCompletion": 100,
     "totalPossible": 200,
-    "minimumPassing": 100
+    "minimumPassing": 100,
+    "hintPenalty": 50
   }
 } 

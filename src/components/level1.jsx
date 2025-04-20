@@ -38,6 +38,8 @@ export default function Level1() {
   const [autoAdvance, setAutoAdvance] = useState(true);
   const [score, setScore] = useState(0);
   const [memoryViolations, setMemoryViolations] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
@@ -56,6 +58,27 @@ export default function Level1() {
       return () => clearTimeout(timer);
     }
   }, [showDialogue, dialogueIndex, autoAdvance, levelData.dialogue.intro.length]);
+
+  const handleHintClick = async () => {
+    if (!hintUsed) {
+      setShowHint(true);
+      setHintUsed(true);
+      
+      // Reduce score by hint penalty
+      const newScore = score - scoringData.hintPenalty;
+      setScore(newScore);
+      
+      // Update score in Firebase
+      await updateUserScore('level1', newScore);
+      
+      // Log hint usage
+      await logActivity('hint_used', {
+        level: 'level1',
+        questionId: currentQuestion.id,
+        score: -scoringData.hintPenalty
+      });
+    }
+  };
 
   const handleAnswerSubmit = async () => {
     const selectedOption = currentQuestion.options.find(opt => opt.id === userAnswer);
@@ -101,6 +124,8 @@ export default function Level1() {
     setShowExplanation(false);
     setShowQuestion(false);
     setUserAnswer("");
+    setShowHint(false);
+    setHintUsed(false);
     
     // Check if there are more questions
     if (currentPosition < levelData.puzzles.questions.length - 1) {
@@ -432,6 +457,40 @@ export default function Level1() {
           }}>
             {currentQuestion.question}
           </div>
+
+          {/* Hint Button */}
+          {!hintUsed && (
+            <button
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: 'var(--secondary)',
+                color: 'var(--primary-foreground)',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginBottom: '1rem',
+                fontSize: '0.9rem',
+                transition: 'background-color 0.3s ease'
+              }}
+              onClick={handleHintClick}
+            >
+              Need a Hint? (-5 points)
+            </button>
+          )}
+
+          {/* Hint Display */}
+          {showHint && (
+            <div style={{
+              marginBottom: '1.5rem',
+              padding: '1rem',
+              backgroundColor: 'rgba(33, 150, 243, 0.1)',
+              border: '1px solid var(--secondary)',
+              borderRadius: '5px',
+              color: 'var(--secondary)'
+            }}>
+              <strong>Hint:</strong> {currentQuestion.hint}
+            </div>
+          )}
 
           {/* Options */}
           <div style={{
