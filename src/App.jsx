@@ -13,7 +13,7 @@ import SettingPage from "./components/Setting";
 import Level1 from "./components/level1";
 import Level2 from "./components/level2";
 import Level3 from "./components/level3";
-import { initializeUserProgress } from "./services/firebaseService";
+import { initializeUserProgress, getUserProgress } from "./services/firebaseService";
 import Leaderboard from './components/Leaderboard';
 import AudioPlayer from './components/AudioPlayer';
 import { AudioProvider } from './context/AudioContext';
@@ -36,6 +36,17 @@ function App() {
         // Initialize user progress in Firebase when user logs in
         try {
           await initializeUserProgress();
+          
+          // Apply user theme preferences
+          const userProgress = await getUserProgress();
+          if (userProgress && userProgress.preferences) {
+            const theme = userProgress.preferences.environment.theme || "dark";
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Apply font size
+            const fontSize = userProgress.preferences.environment.fontSize || 14;
+            document.documentElement.style.fontSize = `${fontSize}px`;
+          }
         } catch (error) {
           console.error("Error initializing user progress:", error);
         }

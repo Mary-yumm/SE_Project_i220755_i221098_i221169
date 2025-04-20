@@ -18,13 +18,13 @@ button {
   font-weight: 500;
 }
 
-/* Darker and modern buttons */
+/* Theme-aware buttons */
 .settings-btn,
 .leaderboard-btn,
 .profile-btn,
 .logout-btn {
-  background-color: #2a0c4e; /* Dark purple */
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   padding: 6px 14px; /* Shorter and sleek */
   font-size: 13px; /* Slightly smaller */
   border-radius: 6px;
@@ -34,7 +34,7 @@ button {
 .leaderboard-btn:hover,
 .profile-btn:hover,
 .logout-btn:hover {
-  background-color: #1c072e; /* Even darker on hover */
+  background-color: var(--secondary);
   transform: translateY(-2px); /* Slight lift effect */
 }
 .logout-btn {
@@ -51,11 +51,11 @@ button {
 }
 
 .logout-btn:hover {
-  background-color: rgb(52, 49, 67);
+  background-color: var(--muted);
 }
 
 .user-email {
-  color: rgb(218, 194, 227);
+  color: var(--foreground);
   font-size: 12px;
   font-family: 'Fira Code', monospace;
   text-align: right;
@@ -63,8 +63,8 @@ button {
 }
 
 .settings-btn {
-  background-color: #4a148c;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 8px 12px;
   margin-left: 5px;
@@ -73,8 +73,8 @@ button {
   border-radius: 5px;
 }
 .leaderboard-btn {
-  background-color: #4a148c;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 8px 12px;
   margin-left: 5px;
@@ -83,8 +83,8 @@ button {
   border-radius: 5px;
 }
 .profile-btn {
-  background-color: #4a148c;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 8px 12px;
   margin-left: 5px;
@@ -94,10 +94,10 @@ button {
 }
 
 .settings-btn:hover {
-  background-color: #6a1b9a;
+  background-color: var(--secondary);
 }
 .profile-btn:hover {
-  background-color: #6a1b9a;
+  background-color: var(--secondary);
 }
 .home-container {
   width: 100vw;
@@ -106,14 +106,14 @@ button {
   padding: 50px;
   font-family: Arial, sans-serif;
   position: relative;
-  background: linear-gradient(to bottom, #090011, #1c072e);
+  background: var(--background);
   height: 100vh;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--foreground);
   overflow: hidden;
 }
 /* BrainByte Logo */
@@ -123,7 +123,7 @@ button {
   left: 5%;
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: var(--foreground);
  font-family: 'Fira Code', monospace;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   z-index: 1;
@@ -139,8 +139,8 @@ button {
 .settings-btn,
 .leaderboard-btn,
 .logout-btn {
-  background-color: #4a148c;
-  color: white;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: none;
   padding: 8px 12px;
   font-size: 14px;
@@ -150,12 +150,12 @@ button {
 
 .settings-btn:hover,
 .leaderboard-btn:hover{
-  background-color: #6a1b9a;
+  background-color: var(--secondary);
 }
 
 /* User Name */
 .user-name {
-  color: rgb(218, 194, 227);
+  color: var(--foreground);
   font-size: 20px;
   font-family: 'Fira Code', monospace;
   margin-top: 80px;
@@ -170,7 +170,7 @@ button {
   gap: 50px;
   font-family: 'Fira Code', monospace;
   font-size: 15px;
-  color: rgb(218, 194, 227);
+  color: var(--foreground);
   margin-top: 50px;
   flex-wrap: wrap; /* Allow wrapping if screen is too small */
   padding: 0 20px; /* Add some padding on the sides */
@@ -244,7 +244,7 @@ button {
 
 .lock-icon {
   font-size: 4rem;
-  color: #ff3333; /* Bright red color */
+  color: var(--destructive);
   text-shadow: 0 0 10px rgba(255, 0, 0, 0.7), /* Red glow */
                0 0 20px rgba(255, 0, 0, 0.5),
                0 0 30px rgba(255, 0, 0, 0.3);
@@ -298,7 +298,7 @@ button {
 .island-name {
   font-size: 20px;
   font-weight: bold;
-  color: rgb(218, 194, 227);
+  color: var(--foreground);
   margin-bottom: 10px; /* Space between name and image */
   transition: transform 0.3s ease;
 }
@@ -309,18 +309,18 @@ button {
 }
 .level-description {
   font-size: 14px;
-  color: #ddd;
+  color: var(--foreground);
   margin-top: 15px; /* Space between image and description */
 }
 .profile-icon {
   font-size: 16px; /* Reduced from 22px */
-  color: white;
+  color: var(--foreground);
   cursor: pointer;
   transition: color 0.2s ease-in-out;
 }
 
 .profile-icon:hover {
-  color: #b38aff; /* Light purple on hover */
+  color: var(--secondary); /* Light purple on hover */
 }
 
 .home-container {
@@ -489,4 +489,11 @@ button {
     flex-direction: column;
     align-items: center;
   }
+}
+
+.motto {
+  color: var(--foreground);
+  font-size: 16px;
+  font-weight: normal;
+  margin-left: 10px;
 }

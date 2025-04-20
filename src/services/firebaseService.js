@@ -248,9 +248,20 @@ const getNextLevel = (currentLevel) => {
 export const updateEnvironmentPreferences = async (preferences) => {
   try {
     const userRef = getUserRef();
+    
+    // Log the preferences being updated for debugging
+    console.log('Updating environment preferences:', preferences);
+    
+    // Update the environment preferences in the database
     await update(userRef, {
       'preferences/environment': preferences
     });
+    
+    // Verify the update was successful
+    const updatedProgress = await getUserProgress();
+    console.log('Updated preferences:', updatedProgress?.preferences?.environment);
+    
+    return updatedProgress;
   } catch (error) {
     console.error('Error updating environment preferences:', error);
     throw error;
