@@ -82,7 +82,7 @@ export default function HomePage() {
           ⚙️ Settings
         </button>
         <button className="leaderboard-btn" onClick={navigateToleaderboard}>
-          🏆 leaderboard
+          🏆 Leaderboard
         </button>
       </div>
 

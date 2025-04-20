@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { getUserProgress, updatePremiumStatus } from "../services/firebaseService";
+import { getUserProgress, updatePremiumStatus, getUserRank, updateUserRank } from "../services/firebaseService";
 import "../styles/ProfilePage.css";
 
 import avatar from "../assets/avatar1.avif";
@@ -42,11 +42,12 @@ function Profile({ user }) {
   const [userProgress, setUserProgress] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userRank, setUserRank] = useState("Beginner");
+  const [isUpdatingRank, setIsUpdatingRank] = useState(false);
   
   const [displayName, setDisplayName] = useState(user.displayName || "John Doe");
   const [bio, setBio] = useState("Aspiring Software Engineer");
   const [language, setLanguage] = useState("JavaScript");
-  const [level, setLevel] = useState("Intermediate");
   const [streak, setStreak] = useState(5);
   const [challengesCompleted, setChallengesCompleted] = useState(120);
   const [accuracyRate, setAccuracyRate] = useState(85);
@@ -54,19 +55,23 @@ function Profile({ user }) {
   const [currencyBalance, setCurrencyBalance] = useState(500);
 
   useEffect(() => {
-    const fetchUserProgress = async () => {
+    const fetchUserData = async () => {
       try {
         const progress = await getUserProgress();
         setUserProgress(progress);
         setIsPremium(progress?.premium?.status || false);
+        
+        // Fetch user rank
+        const rank = await getUserRank();
+        setUserRank(rank);
       } catch (error) {
-        console.error("Error fetching user progress:", error);
+        console.error("Error fetching user data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserProgress();
+    fetchUserData();
   }, []);
 
   const handlePremiumToggle = async () => {
@@ -79,6 +84,20 @@ function Profile({ user }) {
     } catch (error) {
       console.error("Error updating premium status:", error);
       alert("Failed to update premium status. Please try again.");
+    }
+  };
+
+  const handleRankChange = async (newRank) => {
+    try {
+      setIsUpdatingRank(true);
+      await updateUserRank(newRank);
+      setUserRank(newRank);
+      alert(`Proficiency level updated to ${newRank} successfully!`);
+    } catch (error) {
+      console.error("Error updating proficiency level:", error);
+      alert("Failed to update proficiency level. Please try again.");
+    } finally {
+      setIsUpdatingRank(false);
     }
   };
 
@@ -115,11 +134,17 @@ function Profile({ user }) {
         <input type="text" value={language} onChange={(e) => setLanguage(e.target.value)} />
 
         <label>Coding Proficiency Level:</label>
-        <select value={level} onChange={(e) => setLevel(e.target.value)}>
-          <option>Beginner</option>
-          <option>Intermediate</option>
-          <option>Expert</option>
+        <select 
+          value={userRank} 
+          onChange={(e) => handleRankChange(e.target.value)}
+          disabled={isUpdatingRank}
+        >
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+          <option value="Expert">Expert</option>
         </select>
+        {isUpdatingRank && <span className="updating-indicator">Updating...</span>}
 
         <h2>Premium Status</h2>
         <div className="premium-toggle">

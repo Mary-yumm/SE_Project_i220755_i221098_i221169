@@ -1,13 +1,15 @@
 // Level2.jsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Phaser from 'phaser';
 import LabyrinthScene from '../game/LabyrinthScene';
+import level2Data from '../data/level2Data.json';
 
 const Level2 = () => {
   const gameContainer = useRef(null);
   const navigate = useNavigate();
   const gameRef = useRef(null);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     if (gameContainer.current && !gameRef.current) {
@@ -28,6 +30,11 @@ const Level2 = () => {
       };
 
       gameRef.current = new Phaser.Game(config);
+      
+      // Listen for score updates from the game
+      window.addEventListener('scoreUpdate', (event) => {
+        setScore(event.detail.score);
+      });
     }
 
     return () => {
@@ -35,6 +42,7 @@ const Level2 = () => {
         gameRef.current.destroy(true);
         gameRef.current = null;
       }
+      window.removeEventListener('scoreUpdate', () => {});
     };
   }, []);
 
@@ -75,15 +83,26 @@ const Level2 = () => {
         >
           Back to Home
         </button>
-        <h1 style={{
-          margin: '0 auto',
-          padding: '0.5rem 1rem',
-          backgroundColor: 'var(--primary)',
-          color: 'var(--primary-foreground)',
-          borderRadius: '5px'
-        }}>
-          🧠 Level 2: The Labyrinth of Lost Addresses
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            borderRadius: '5px',
+            fontWeight: 'bold'
+          }}>
+            Score: {score}
+          </div>
+          <h1 style={{
+            margin: '0 auto',
+            padding: '0.5rem 1rem',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            borderRadius: '5px'
+          }}>
+            🧠 Level 2: The Labyrinth of Lost Addresses
+          </h1>
+        </div>
       </div>
       <div 
         ref={gameContainer}

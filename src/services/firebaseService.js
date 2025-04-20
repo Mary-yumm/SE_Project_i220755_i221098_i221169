@@ -288,8 +288,10 @@ export const logActivity = async (activityType, details) => {
   try {
     const userRef = getUserRef();
     const timestamp = new Date().toISOString();
+    // Create a valid key by replacing invalid characters
+    const validKey = timestamp.replace(/[.#$\/\[\]]/g, '_');
     await update(userRef, {
-      [`activityLog/${activityType}/${timestamp}`]: details
+      [`activityLog/${activityType}/${validKey}`]: details
     });
   } catch (error) {
     console.error('Error logging activity:', error);
@@ -397,4 +399,67 @@ const increment = (delta) => {
       'increment': delta
     }
   };
+};
+
+// Get user's proficiency level (rank)
+export const getUserRank = async () => {
+  try {
+    const userRef = getUserRef();
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      return snapshot.val().profile.rank;
+    }
+    return 'Beginner'; // Default rank if not found
+  } catch (error) {
+    console.error('Error getting user rank:', error);
+    throw error;
+  }
+};
+
+// Update user's proficiency level (rank)
+export const updateUserRank = async (newRank) => {
+  try {
+    // Validate the rank value
+    const validRanks = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+    if (!validRanks.includes(newRank)) {
+      throw new Error(`Invalid rank value. Must be one of: ${validRanks.join(', ')}`);
+    }
+    
+    const userRef = getUserRef();
+    await update(userRef, {
+      'profile/rank': newRank
+    });
+    
+    // Log the rank change
+    await logActivity('rankChange', {
+      previousRank: await getUserRank(),
+      newRank: newRank,
+      timestamp: new Date().toISOString()
+    });
+    
+    return newRank;
+  } catch (error) {
+    console.error('Error updating user rank:', error);
+    throw error;
+  }
+};
+
+// Update user score for a specific level
+export const updateUserScore = async (levelId, score) => {
+  try {
+    const userRef = getUserRef();
+    const updates = {
+      [`currentState/${levelId}/score`]: score,
+      'profile/totalPoints': increment(score)
+    };
+    await update(userRef, updates);
+    
+    // Also update the leaderboard
+    await updateLeaderboard(score);
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating user score:', error);
+    throw error;
+  }
 }; 

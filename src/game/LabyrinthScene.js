@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import level2Data from '../data/level2Data.json';
 import { LevelManager } from '../utils/LevelManager';
+import { updateUserScore, logActivity } from '../services/firebaseService';
 
 export default class LabyrinthScene extends Phaser.Scene {
   constructor() {
@@ -10,6 +11,9 @@ export default class LabyrinthScene extends Phaser.Scene {
     this.currentStep = 0;
     this.gameState = level2Data.gameState.initialState;
     this.playerPath = [];
+    this.score = 0;
+    this.memoryViolations = 0;
+    this.scoringData = level2Data.scoring;
   }
 
   preload() {
@@ -70,6 +74,13 @@ export default class LabyrinthScene extends Phaser.Scene {
     this.createMapTiles();
     this.setupPlayer();
     this.showIntroDialogue();
+
+    // Add score display
+    this.scoreText = this.add.text(20, 20, `Score: ${this.score}`, {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontStyle: 'bold'
+    });
   }
 
   setupPlayer() {
@@ -274,170 +285,157 @@ export default class LabyrinthScene extends Phaser.Scene {
     });
   }
 
-  handleAnswer(choice, popup, resolve) {
+  async handleAnswer(choice, popup, resolve) {
     const step = this.puzzleSteps[this.currentStep];
-    const correct = step.options[choice].correct;
-
-    // Create feedback popup
-    const feedbackBg = this.add.rectangle(0, 150, 500, 80, 
-      correct ? 0x002200 : 0x220000, 0.8)
-      .setStrokeStyle(2, correct ? level2Data.visualSettings.colors.success : level2Data.visualSettings.colors.error);
+    const isCorrect = choice === 'a' ? 
+      step.options[0].correct : 
+      step.options[1].correct;
     
-    const feedbackText = this.add.text(0, 150,
-      correct ? step.feedback.success : step.feedback.failure,
+    // Update score based on correct/incorrect answer
+    const scoreChange = isCorrect ? 
+      this.scoringData.questionPoints.correct : 
+      this.scoringData.questionPoints.incorrect;
+    
+    this.score += scoreChange;
+    
+    // Update score in Firebase immediately
+    await updateUserScore('level2', this.score);
+    
+    // Log activity
+    await logActivity(isCorrect ? 'correct_answer' : 'incorrect_answer', {
+      level: 'level2',
+      questionId: step.id,
+      score: scoreChange
+    });
+    
+    // Show feedback
+    const feedbackText = isCorrect ? step.feedback.success : step.feedback.failure;
+    
+    // Create feedback text
+    const feedback = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 100,
+      feedbackText,
       {
-        fontSize: '20px',
-        fill: correct ? level2Data.visualSettings.colors.success : level2Data.visualSettings.colors.error,
-        align: 'center'
+        fontSize: '18px',
+        fill: isCorrect ? '#00ff00' : '#ff0000',
+        align: 'center',
+        wordWrap: { width: 550 }
       }
     ).setOrigin(0.5);
-
-    popup.add([feedbackBg, feedbackText]);
-
-    if (correct) {
-      // Visual feedback for correct answer
-      this.cameras.main.flash(level2Data.visualSettings.animations.flashDuration, 0, 255, 0);
-      this.currentStep++;
-      
-      // Destroy popup after delay
-      this.time.delayedCall(1500, () => {
-        this.tweens.add({
-          targets: popup,
-          alpha: 0,
-          duration: level2Data.visualSettings.animations.transitionDuration,
-          onComplete: () => {
-            popup.destroy();
-            resolve(true);
-          }
-        });
+    
+    // Add to popup container
+    popup.add(feedback);
+    
+    // Fade out popup after delay
+    this.time.delayedCall(2000, () => {
+      this.tweens.add({
+        targets: popup,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+          popup.destroy();
+          resolve();
+        }
       });
+    });
+    
+    // Move to next step if correct
+    if (isCorrect) {
+      this.currentStep++;
     } else {
-      // Visual feedback for wrong answer
-      this.cameras.main.shake(500, level2Data.visualSettings.animations.shakeIntensity);
-      
-      // Trigger glitch effect
-      this.glitchEffect.setPosition(this.player.x, this.player.y);
-      this.glitchEffect.explode(level2Data.penalty.effect.particles.quantity);
-      
-      // Apply penalty
-      if (this.playerPath.length > level2Data.penalty.stepsBack) {
-        const penaltyPosition = this.playerPath[this.playerPath.length - (level2Data.penalty.stepsBack + 1)];
-        this.playerPath = this.playerPath.slice(0, -level2Data.penalty.stepsBack);
-        
-        // Add glitch effect during teleport
-        const teleportEffect = this.add.particles(this.player.x, this.player.y, 'memory-tile', {
-          speed: level2Data.penalty.effect.particles.speed,
-          angle: level2Data.penalty.effect.particles.angle,
-          scale: level2Data.penalty.effect.particles.scale,
-          blendMode: 'ADD',
-          lifespan: level2Data.penalty.effect.particles.lifespan,
-          quantity: level2Data.penalty.effect.particles.quantity
-        });
-
-        // Move player back with glitch effect
-        this.tweens.add({
-          targets: this.player,
-          x: penaltyPosition.x,
-          y: penaltyPosition.y,
-          duration: level2Data.visualSettings.animations.transitionDuration,
-          ease: 'Power2',
-          onComplete: () => {
-            teleportEffect.destroy();
-          }
-        });
-
-        // Add penalty message with glitch effect
-        const penaltyText = this.add.text(
-          this.cameras.main.centerX,
-          this.cameras.main.centerY - 100,
-          level2Data.penalty.message,
-          {
-            fontSize: '24px',
-            fill: level2Data.visualSettings.colors.error,
-            fontStyle: 'bold'
-          }
-        ).setOrigin(0.5);
-
-        // Add glitch effect to text
-        this.tweens.add({
-          targets: penaltyText,
-          x: { value: penaltyText.x + 5, duration: 50, yoyo: true, repeat: 5 },
-          alpha: { value: 0.5, duration: 50, yoyo: true, repeat: 5 },
-          onComplete: () => {
-            this.tweens.add({
-              targets: penaltyText,
-              alpha: 0,
-              duration: level2Data.visualSettings.animations.transitionDuration,
-              onComplete: () => penaltyText.destroy()
-            });
-          }
-        });
+      // Apply memory violation penalty
+      const penalty = level2Data.penalty.stepsBack;
+      if (this.playerPath.length > penalty) {
+        const newPosition = this.playerPath[this.playerPath.length - penalty - 1];
+        this.player.x = newPosition.x;
+        this.player.y = newPosition.y;
+        this.playerPath = this.playerPath.slice(0, this.playerPath.length - penalty);
       }
       
-      // Remove feedback after delay
-      this.time.delayedCall(2000, () => {
-        feedbackBg.destroy();
-        feedbackText.destroy();
-      });
+      // Show glitch effect
+      this.glitchEffect.setQuantity(level2Data.penalty.effect.particles.quantity);
+      this.glitchEffect.setSpeed(
+        level2Data.penalty.effect.particles.speed.min,
+        level2Data.penalty.effect.particles.speed.max
+      );
+      this.glitchEffect.setAngle(
+        level2Data.penalty.effect.particles.angle.min,
+        level2Data.penalty.effect.particles.angle.max
+      );
+      this.glitchEffect.setLifespan(level2Data.penalty.effect.particles.lifespan);
+      this.glitchEffect.setScale(
+        level2Data.penalty.effect.particles.scale.start,
+        level2Data.penalty.effect.particles.scale.end
+      );
       
-      resolve(false);
+      // Show penalty message
+      const penaltyText = this.add.text(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY - 100,
+        level2Data.penalty.message,
+        {
+          fontSize: '24px',
+          fill: '#ff0000',
+          fontStyle: 'bold'
+        }
+      ).setOrigin(0.5);
+      
+      this.time.delayedCall(2000, () => {
+        penaltyText.destroy();
+      });
     }
   }
 
   async handleLevelComplete() {
-    const text = level2Data.dialogue.completion.join('\n');
-
+    // Add level completion points
+    const finalScore = this.score + this.scoringData.levelCompletion;
+    this.score = finalScore;
+    
+    // Update score in Firebase
+    await updateUserScore('level2', finalScore);
+    
+    // Log activity
+    await logActivity('level_completed', {
+      level: 'level2',
+      score: finalScore
+    });
+    
+    // Show completion dialogue
+    const text = level2Data.dialogue.completion.join('\n\n');
+    
     const style = {
-      fontSize: '32px',
+      fontSize: '24px',
       fill: '#fff',
       align: 'center',
-      backgroundColor: '#00aa00aa',
+      backgroundColor: '#000a',
       padding: { x: 20, y: 10 }
     };
     
-    const message = this.add.text(
+    const dialogue = this.add.text(
       this.cameras.main.centerX,
       this.cameras.main.centerY,
       text,
       style
     ).setOrigin(0.5);
-
-    // Add visual effects
-    message.setStroke(level2Data.visualSettings.colors.success, 4);
-    message.setShadow(2, 2, '#000000', 2, true, true);
-
-    // Add particle effect
-    const particles = this.add.particles(this.cameras.main.centerX, this.cameras.main.centerY, 'memory-tile', {
-      speed: { min: -200, max: 200 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 0.1, end: 0 },
-      blendMode: 'ADD',
-      lifespan: 1000,
-      quantity: 2
-    });
-
-    try {
-      // Mark level as completed
-      await LevelManager.completeLevel('level2');
-
-      // Transition to next level after delay
-      this.time.delayedCall(5000, async () => {
-        this.tweens.add({
-          targets: [message, particles],
-          alpha: 0,
-          duration: level2Data.visualSettings.animations.transitionDuration,
-          onComplete: async () => {
-            particles.destroy();
-            // Go to next unlocked level
-            const nextLevel = await LevelManager.getNextUnlockedLevel();
-            this.scene.start(nextLevel);
-          }
-        });
+    
+    // Add glowing effect
+    dialogue.setStroke(level2Data.visualSettings.colors.success, 2);
+    dialogue.setShadow(2, 2, '#000000', 2, true, true);
+    
+    // Fade out after 5 seconds and navigate to home
+    this.time.delayedCall(5000, () => {
+      this.tweens.add({
+        targets: dialogue,
+        alpha: 0,
+        duration: level2Data.visualSettings.animations.transitionDuration,
+        onComplete: () => {
+          dialogue.destroy();
+          // Navigate to home page
+          window.location.href = '/home';
+        }
       });
-    } catch (error) {
-      console.error('Error completing level:', error);
-      // Handle error appropriately
-    }
+    });
   }
 
   update(time) {
@@ -483,6 +481,16 @@ export default class LabyrinthScene extends Phaser.Scene {
         
         this.stepCooldown = time + 200;
       }
+    }
+
+    // Update score display
+    if (this.scoreText) {
+      this.scoreText.setText(`Score: ${this.score}`);
+      
+      // Dispatch score update event for React component
+      window.dispatchEvent(new CustomEvent('scoreUpdate', {
+        detail: { score: this.score }
+      }));
     }
   }
 }

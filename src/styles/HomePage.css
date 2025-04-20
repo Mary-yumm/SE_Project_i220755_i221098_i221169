@@ -132,11 +132,9 @@ button {
 /* User Info & Buttons */
 .icon-bar {
   display: flex;
-  gap: 10px;
-  position: absolute;
-  top: 5%;
-  right: 5%;
-  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 .settings-btn,
 .leaderboard-btn,
@@ -315,12 +313,180 @@ button {
   margin-top: 15px; /* Space between image and description */
 }
 .profile-icon {
-  font-size: 22px; /* Adjust size */
-  color: white; /* Set color */
+  font-size: 16px; /* Reduced from 22px */
+  color: white;
   cursor: pointer;
   transition: color 0.2s ease-in-out;
 }
 
 .profile-icon:hover {
   color: #b38aff; /* Light purple on hover */
+}
+
+.home-container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.level-selection {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.level-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.level-btn {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid var(--border);
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
+
+.level-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.level1-btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.level1-btn:hover:not(:disabled) {
+  background-color: var(--secondary);
+}
+
+.level2-btn {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.level2-btn:hover:not(:disabled) {
+  background-color: var(--accent);
+}
+
+.level3-btn {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.level3-btn:hover:not(:disabled) {
+  background-color: var(--primary);
+}
+
+.icon-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.leaderboard-btn,
+.settings-btn,
+.profile-btn,
+.logout-btn,
+.login-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+}
+
+.leaderboard-btn,
+.settings-btn,
+.profile-btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.logout-btn,
+.login-btn {
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
+
+.leaderboard-btn:hover,
+.settings-btn:hover,
+.profile-btn:hover,
+.logout-btn:hover,
+.login-btn:hover {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--muted);
+  border-top: 5px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 1rem;
+  }
+  
+  .level-buttons {
+    max-width: 100%;
+  }
+  
+  .icon-bar {
+    flex-direction: column;
+    align-items: center;
+  }
 }

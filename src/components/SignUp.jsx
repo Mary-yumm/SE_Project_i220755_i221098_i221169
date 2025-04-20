@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import "../styles/SignIn.css"
-import { signUp } from "../utils/auth"; // Import auth functions
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../utils/firebase"; // Import Firebase auth
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { ref, set } from "firebase/database";
+import { db } from "../utils/firebase";
 
 export default function BrainByteSignUpPage() {
     const navigate = useNavigate(); // Initialize navigation
@@ -138,20 +137,140 @@ export default function BrainByteSignUpPage() {
         setIsSubmitting(true)
 
         try {
+            console.log("Starting signup process...");
+            
             // Firebase Authentication - Create User
+            console.log("Creating user with email:", formData.email);
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 formData.email,
                 formData.password
             );
+            console.log("User created successfully:", userCredential.user.uid);
 
-            console.log("User signed up:", userCredential.user);
-            navigate("/SignIn")
+            // Update user profile
+            console.log("Updating user profile...");
+            await updateProfile(userCredential.user, {
+                displayName: formData.name
+            });
+            console.log("Profile updated successfully");
+
+            // Initialize user data in Firebase
+            console.log("Preparing user data...");
+            const userRef = ref(db, `users/${userCredential.user.uid}`);
+            const userData = {
+                profile: {
+                    email: formData.email,
+                    username: formData.name,
+                    age: formData.age,
+                    experience: formData.experience,
+                    joinedDate: new Date().toISOString(),
+                    lastActive: new Date().toISOString(),
+                    preferredLanguage: 'en',
+                    rank: 'Beginner',
+                    totalPoints: 0
+                },
+                preferences: {
+                    environment: {
+                        theme: 'dark',
+                        fontSize: 14,
+                        layout: 'default',
+                        colors: {
+                            background: '#1E1E1E',
+                            text: '#FFFFFF',
+                            accent: '#4CAF50'
+                        }
+                    },
+                    sound: {
+                        enabled: true,
+                        volume: 0.8,
+                        music: true,
+                        sfx: true
+                    },
+                    language: 'en',
+                    difficulty: 'normal',
+                    hints: {
+                        enabled: true,
+                        usedCount: 0
+                    }
+                },
+                premium: {
+                    status: false,
+                    expiryDate: null,
+                    features: {
+                        advancedLessons: false,
+                        customThemes: false,
+                        noAds: false,
+                        prioritySupport: false
+                    }
+                },
+                progress: {
+                    currentLevel: 'level1',
+                    completedLevels: {},
+                    stats: {
+                        totalQuestions: 0,
+                        correctAnswers: 0,
+                        incorrectAnswers: 0,
+                        timeSpent: 0,
+                        memoryViolations: 0,
+                        hintsUsed: 0,
+                        perfectLevels: 0,
+                        totalPoints: 0
+                    }
+                },
+                currentState: {
+                    level1: {
+                        currentQuestion: 0,
+                        completedQuestions: [],
+                        dialogueSeen: false,
+                        lastPosition: { x: 0, y: 0 },
+                        hintsUsed: [],
+                        attempts: 0,
+                        score: 0
+                    },
+                    level2: {
+                        currentQuestion: 0,
+                        completedQuestions: [],
+                        dialogueSeen: false,
+                        lastPosition: { x: 0, y: 0 },
+                        hintsUsed: [],
+                        attempts: 0,
+                        score: 0
+                    },
+                    level3: {
+                        currentQuestion: 0,
+                        completedQuestions: [],
+                        dialogueSeen: false,
+                        lastPosition: { x: 0, y: 0 },
+                        hintsUsed: [],
+                        attempts: 0,
+                        score: 0
+                    }
+                }
+            };
+
+            console.log("Attempting to write to database...");
+            console.log("Database path:", `users/${userCredential.user.uid}`);
+            console.log("User data:", userData);
+
+            // Make sure we're using the authenticated user
+            if (auth.currentUser) {
+                await set(userRef, userData);
+                console.log("Data written successfully");
+            } else {
+                throw new Error("User not authenticated after signup");
+            }
+
+            navigate("/SignIn");
             alert("Signup successful!");
         } catch (error) {
-            console.error("Error:", error)
+            console.error("Detailed error:", error);
+            console.error("Error code:", error.code);
+            console.error("Error message:", error.message);
+            console.error("Error stack:", error.stack);
+            alert("Error during signup: " + error.message);
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
     }
 

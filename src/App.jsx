@@ -14,6 +14,7 @@ import Level1 from "./components/level1";
 import Level2 from "./components/level2";
 import Level3 from "./components/level3";
 import { initializeUserProgress } from "./services/firebaseService";
+import Leaderboard from './components/Leaderboard';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -113,6 +114,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Level3 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
               </ProtectedRoute>
             }
           />

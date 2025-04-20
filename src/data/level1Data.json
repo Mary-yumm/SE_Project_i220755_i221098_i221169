@@ -116,5 +116,14 @@
       "maxViolations": 3,
       "description": "Each memory violation costs 10 points. Exceeding 3 violations fails the level."
     }
+  },
+  "scoring": {
+    "questionPoints": {
+      "correct": 25,
+      "incorrect": -10
+    },
+    "levelCompletion": 100,
+    "totalPossible": 200,
+    "minimumPassing": 100
   }
 } 

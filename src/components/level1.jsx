@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/level1.css";
 import questionsData from "../data/level1Data.json";
-import { completeLevel, updateCurrentLevel } from '../services/firebaseService';
-import { logActivity } from '../services/firebaseService';
+import { completeLevel, updateCurrentLevel, updateUserScore, logActivity } from '../services/firebaseService';
+import { getAuth } from 'firebase/auth';
 
 // Add keyframes for blinking animation
 const blinkAnimation = `
@@ -36,9 +36,12 @@ export default function Level1() {
   const [showDialogue, setShowDialogue] = useState(true);
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
+  const [score, setScore] = useState(0);
+  const [memoryViolations, setMemoryViolations] = useState(0);
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
+  const scoringData = levelData.scoring;
 
   // Auto-advance dialogue
   useEffect(() => {
@@ -54,14 +57,42 @@ export default function Level1() {
     }
   }, [showDialogue, dialogueIndex, autoAdvance, levelData.dialogue.intro.length]);
 
-  const handleAnswerSubmit = () => {
+  const handleAnswerSubmit = async () => {
     const selectedOption = currentQuestion.options.find(opt => opt.id === userAnswer);
     if (selectedOption && selectedOption.correct) {
       setShowSuccess(true);
       setShowExplanation(true);
+      
+      // Update score for correct answer
+      const newScore = score + scoringData.questionPoints.correct;
+      setScore(newScore);
+      
+      // Update score in Firebase immediately
+      await updateUserScore('level1', newScore);
+      
+      // Log activity
+      await logActivity('correct_answer', {
+        level: 'level1',
+        questionId: currentQuestion.id,
+        score: scoringData.questionPoints.correct
+      });
     } else {
       setShowWrongAnswer(true);
       setUserAnswer("");
+      
+      // Update score for incorrect answer
+      const newScore = score + scoringData.questionPoints.incorrect;
+      setScore(newScore);
+      
+      // Update score in Firebase immediately
+      await updateUserScore('level1', newScore);
+      
+      // Log activity
+      await logActivity('incorrect_answer', {
+        level: 'level1',
+        questionId: currentQuestion.id,
+        score: scoringData.questionPoints.incorrect
+      });
     }
   };
 
@@ -87,9 +118,61 @@ export default function Level1() {
     } else {
       console.log('Level completed, attempting to complete level and navigate...');
       try {
+        // Add level completion points
+        const finalScore = score + scoringData.levelCompletion;
+        setScore(finalScore);
+        
+        // Update score in Firebase
+        await updateUserScore('level1', finalScore);
+        
+        // Complete the level
         await completeLevel('level1');
-        console.log('Level completed in Firebase, navigating to home...');
-        navigate('/home', { replace: true }); // Use replace to prevent going back
+        
+        // Log activity
+        await logActivity('level_completed', {
+          level: 'level1',
+          score: finalScore
+        });
+        
+        // Show completion popup
+        const completionMessage = document.createElement('div');
+        completionMessage.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: var(--card);
+          padding: 2rem;
+          border-radius: 10px;
+          box-shadow: 0 0 20px rgba(0,0,0,0.3);
+          z-index: 1000;
+          text-align: center;
+          min-width: 300px;
+        `;
+        
+        completionMessage.innerHTML = `
+          <h2 style="color: var(--primary); margin-bottom: 1rem;">Level 1 Completed! 🎉</h2>
+          <p style="margin-bottom: 1rem;">Congratulations! You've completed Level 1</p>
+          <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">Final Score: ${finalScore}</p>
+          <button 
+            onclick="this.parentElement.remove(); window.location.href='/home';"
+            style="
+              padding: 0.8rem 1.5rem;
+              background-color: var(--primary);
+              color: var(--primary-foreground);
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 1rem;
+              transition: background-color 0.3s ease;
+            "
+          >
+            Continue to Home
+          </button>
+        `;
+        
+        document.body.appendChild(completionMessage);
+        
       } catch (error) {
         console.error('Error completing level:', error);
       }
@@ -177,15 +260,26 @@ export default function Level1() {
         >
           Back to Home
         </button>
-        <h1 style={{
-          marginRight: '2rem',
-          padding: '0.5rem 1rem',
-          backgroundColor: 'var(--primary)',
-          color: 'var(--primary-foreground)',
-          borderRadius: '5px'
-        }}>
-          {levelData.metadata.levelName}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            borderRadius: '5px',
+            fontWeight: 'bold'
+          }}>
+            Score: {score}
+          </div>
+          <h1 style={{
+            marginRight: '2rem',
+            padding: '0.5rem 1rem',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            borderRadius: '5px'
+          }}>
+            {levelData.metadata.levelName}
+          </h1>
+        </div>
       </div>
       
       <div className="image-container" style={{ 
