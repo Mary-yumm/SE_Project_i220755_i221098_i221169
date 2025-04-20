@@ -79,49 +79,37 @@ function App() {
             <Route
               path="/Home"
               element={
-                <ProtectedRoute>
                   <HomePage />
-                </ProtectedRoute>
               }
             />
             <Route
               path="/Profile"
               element={
-                <ProtectedRoute>
                   <ProfilePage />
-                </ProtectedRoute>
               }
             />
             <Route
               path="/Setting"
               element={
-                <ProtectedRoute>
                   <SettingPage />
-                </ProtectedRoute>
               }
             />
             <Route
               path="/Certificate"
               element={
-                <ProtectedRoute>
                   <Certificate />
-                </ProtectedRoute>
               }
             />
             <Route
               path="/level1"
               element={
-                <ProtectedRoute>
                   <Level1 />
-                </ProtectedRoute>
               }
             />
             <Route
               path="/level2"
               element={
-                <ProtectedRoute>
                   <Level2 />
-                </ProtectedRoute>
               }
             />
             <Route
@@ -135,9 +123,7 @@ function App() {
             <Route
               path="/leaderboard"
               element={
-                <ProtectedRoute>
                   <Leaderboard />
-                </ProtectedRoute>
               }
             />
           </Routes>

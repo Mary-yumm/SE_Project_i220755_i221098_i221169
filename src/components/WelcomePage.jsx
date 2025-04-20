@@ -12,7 +12,7 @@ export default function LandingPage() {
           The ultimate coding escape room experience. Solve puzzles, break the locks, and debug your way out.
         </p>
         <div className="home-buttons">
-          <Link to="/SignIn" className="home-button signin-button">
+          <Link to="/Home" className="home-button signin-button">
             Sign In
           </Link>
           <Link to="/SignUp" className="home-button signup-button">
