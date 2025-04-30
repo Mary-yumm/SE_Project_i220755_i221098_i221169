@@ -14,6 +14,21 @@ const COORDINATES = [
   { top: '65%', left: '79.5%' }
 ];
 
+const TimerSelection = ({ onSelect }) => {
+  return (
+    <div className="timer-selection-container">
+      <div className="timer-selection-box">
+        <h2>Select Game Mode</h2>
+        <p>Would you like to play with a timer?</p>
+        <div className="timer-options">
+          <button onClick={() => onSelect(true)}>With Timer (30s per question)</button>
+          <button onClick={() => onSelect(false)}>Without Timer</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Level1() {
   const navigate = useNavigate();
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -33,6 +48,9 @@ export default function Level1() {
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [showTutorial, setShowTutorial] = useState(true);
+  const [withTimer, setWithTimer] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [timerActive, setTimerActive] = useState(false);
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
@@ -51,6 +69,34 @@ export default function Level1() {
       return () => clearTimeout(timer);
     }
   }, [showDialogue, dialogueIndex, autoAdvance, levelData.dialogue.intro.length]);
+
+  // Timer effect
+  useEffect(() => {
+    let interval;
+    if (timerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prevTime => prevTime - 1);
+      }, 1000);
+    } else if (timerActive && timeLeft === 0) {
+      handleTimeUp();
+    }
+    return () => clearInterval(interval);
+  }, [timerActive, timeLeft]);
+
+  const handleTimeUp = async () => {
+    setTimerActive(false);
+    setShowWrongAnswer(true);
+    
+    const newScore = score + scoringData.questionPoints.incorrect;
+    setScore(newScore);
+    await updateUserScore('level1', newScore);
+    await logActivity('time_up', {
+      level: 'level1',
+      questionId: currentQuestion.id,
+      score: scoringData.questionPoints.incorrect
+    });
+    
+  };
 
   const handleHintClick = async () => {
     if (!hintUsed) {
@@ -71,6 +117,7 @@ export default function Level1() {
   const handleAnswerSubmit = async () => {
     const selectedOption = currentQuestion.options.find(opt => opt.id === userAnswer);
     if (selectedOption && selectedOption.correct) {
+      setTimerActive(false);
       setShowSuccess(true);
       setShowExplanation(true);
       
@@ -98,6 +145,11 @@ export default function Level1() {
   };
 
   const handleNextPosition = async () => {
+    // Only proceed if the current question was answered successfully
+    if (!showSuccess) return;
+  
+    setTimerActive(false);
+    setTimeLeft(30);
     setShowSuccess(false);
     setShowExplanation(false);
     setShowQuestion(false);
@@ -118,7 +170,6 @@ export default function Level1() {
         }, 2000);
       }
     } else {
-      console.log('Level completed, attempting to complete level and navigate...');
       try {
         const finalScore = score + scoringData.levelCompletion;
         setScore(finalScore);
@@ -147,6 +198,9 @@ export default function Level1() {
         console.error('Error completing level:', error);
       }
     }
+    if (withTimer) {
+      setTimerActive(true);
+    }
   };
 
   const handleDialogueClick = () => {
@@ -154,17 +208,11 @@ export default function Level1() {
       setDialogueIndex(dialogueIndex + 1);
     } else {
       setShowDialogue(false);
-      if (currentPosition === levelData.puzzles.questions.length - 1) {
-        navigate('/home');
-      }
     }
   };
 
   const skipDialogue = () => {
     setShowDialogue(false);
-    if (currentPosition === levelData.puzzles.questions.length - 1) {
-      navigate('/home');
-    }
   };
 
   if (showDialogue) {
@@ -180,9 +228,22 @@ export default function Level1() {
     );
   }
 
+  if (showTutorial) {
+    return <Level1Tutorial onComplete={() => setShowTutorial(false)} />;
+  }
+
+  if (withTimer === null) {
+    return <TimerSelection onSelect={(choice) => {
+      setWithTimer(choice);
+      if (choice) {
+        setTimeLeft(30);
+        setTimerActive(true);
+      }
+    }} />;
+  }
+
   return (
     <div className="level1-container">
-      {showTutorial && <Level1Tutorial onComplete={() => setShowTutorial(false)} />}
       <div className="level1-header">
         <button className="back-button" onClick={() => navigate("/home")}>
           Back to Home
@@ -194,7 +255,7 @@ export default function Level1() {
       </div>
       
       <div className="image-container">
-        <img  className="background-level1" src="/assets/level1_map2.jpeg" alt="Tileset" />
+        <img className="background-level1" src="/assets/level1_map2.jpeg" alt="Tileset" />
         <img 
           src="/assets/character.png" 
           alt="Character" 
@@ -203,7 +264,15 @@ export default function Level1() {
             top: isMoving ? nextCoord.top : currentCoord.top,
             left: isMoving ? nextCoord.left : currentCoord.left
           }}
-          onClick={() => !isMoving && setShowQuestion(true)}
+          onClick={() => {
+            if (!isMoving) {
+              setShowQuestion(true);
+              if (withTimer) {
+                setTimeLeft(30);
+                setTimerActive(true);
+              }
+            }
+          }}
         />
         <div 
           className={`click-prompt ${isMoving ? 'moving' : ''}`}
@@ -219,14 +288,21 @@ export default function Level1() {
 
       {showQuestion && (
         <div className="question-popup">
-          <div className="question-popup-close" onClick={() => setShowQuestion(false)}>
+          <div className="question-popup-close" onClick={() => {
+            setShowQuestion(false);
+            setTimerActive(false);
+          }}>
             ×
           </div>
           
           <div className="question-title">
             {currentQuestion.title}
           </div>
-
+          {withTimer && timerActive && (
+            <div className="question-timer">
+              Time left: {timeLeft}s
+            </div>
+          )}
           <div className="question-narrative">
             {currentQuestion.narrative}
           </div>
@@ -289,7 +365,13 @@ export default function Level1() {
             </button>
           )}
         </div>
-      )}
+      )
+      }
+      {(showSuccess || showWrongAnswer) && (
+      <button className="next-button" onClick={handleNextPosition}>
+        Continue
+      </button>
+    )}
     </div>
   );
 }
