@@ -6,15 +6,6 @@ import { completeLevel, updateCurrentLevel, updateUserScore, logActivity } from 
 import { getAuth } from 'firebase/auth';
 import Level1Tutorial from './Level1Tutorial';
 
-// Add keyframes for blinking animation
-const blinkAnimation = `
-  @keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-  }
-`;
-
 // Define the coordinates for question positions
 const COORDINATES = [
   { top: '45%', left: '31%' },
@@ -66,14 +57,9 @@ export default function Level1() {
       setShowHint(true);
       setHintUsed(true);
       
-      // Reduce score by hint penalty
       const newScore = score - scoringData.hintPenalty;
       setScore(newScore);
-      
-      // Update score in Firebase
       await updateUserScore('level1', newScore);
-      
-      // Log hint usage
       await logActivity('hint_used', {
         level: 'level1',
         questionId: currentQuestion.id,
@@ -88,14 +74,9 @@ export default function Level1() {
       setShowSuccess(true);
       setShowExplanation(true);
       
-      // Update score for correct answer
       const newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      
-      // Update score in Firebase immediately
       await updateUserScore('level1', newScore);
-      
-      // Log activity
       await logActivity('correct_answer', {
         level: 'level1',
         questionId: currentQuestion.id,
@@ -105,14 +86,9 @@ export default function Level1() {
       setShowWrongAnswer(true);
       setUserAnswer("");
       
-      // Update score for incorrect answer
       const newScore = score + scoringData.questionPoints.incorrect;
       setScore(newScore);
-      
-      // Update score in Firebase immediately
       await updateUserScore('level1', newScore);
-      
-      // Log activity
       await logActivity('incorrect_answer', {
         level: 'level1',
         questionId: currentQuestion.id,
@@ -129,7 +105,6 @@ export default function Level1() {
     setShowHint(false);
     setHintUsed(false);
     
-    // Check if there are more questions
     if (currentPosition < levelData.puzzles.questions.length - 1) {
       const nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
@@ -145,61 +120,29 @@ export default function Level1() {
     } else {
       console.log('Level completed, attempting to complete level and navigate...');
       try {
-        // Add level completion points
         const finalScore = score + scoringData.levelCompletion;
         setScore(finalScore);
-        
-        // Update score in Firebase
         await updateUserScore('level1', finalScore);
-        
-        // Complete the level
         await completeLevel('level1');
-        
-        // Log activity
         await logActivity('level_completed', {
           level: 'level1',
           score: finalScore
         });
         
-        // Show completion popup
         const completionMessage = document.createElement('div');
-        completionMessage.style.cssText = `
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background-color: var(--card);
-          padding: 2rem;
-          border-radius: 10px;
-          box-shadow: 0 0 20px rgba(0,0,0,0.3);
-          z-index: 1000;
-          text-align: center;
-          min-width: 300px;
-        `;
-        
+        completionMessage.className = 'completion-popup';
         completionMessage.innerHTML = `
-          <h2 style="color: var(--primary); margin-bottom: 1rem;">Level 1 Completed! 🎉</h2>
-          <p style="margin-bottom: 1rem;">Congratulations! You've completed Level 1</p>
-          <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">Final Score: ${finalScore}</p>
+          <h2 className="completion-title">Level 1 Completed! 🎉</h2>
+          <p>Congratulations! You've completed Level 1</p>
+          <p className="score-display">Final Score: ${finalScore}</p>
           <button 
             onclick="this.parentElement.remove(); window.location.href='/home';"
-            style="
-              padding: 0.8rem 1.5rem;
-              background-color: var(--primary);
-              color: var(--primary-foreground);
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-              font-size: 1rem;
-              transition: background-color 0.3s ease;
-            "
+            className="completion-button"
           >
             Continue to Home
           </button>
         `;
-        
         document.body.appendChild(completionMessage);
-        
       } catch (error) {
         console.error('Error completing level:', error);
       }
@@ -229,21 +172,7 @@ export default function Level1() {
       <div className="dialogue-container" onClick={handleDialogueClick}>
         <div className="dialogue-box">
           <p>{levelData.dialogue.intro[dialogueIndex]}</p>
-          <button 
-            onClick={skipDialogue}
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              right: '1rem',
-              padding: '0.5rem 1rem',
-              backgroundColor: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
+          <button className="skip-button" onClick={skipDialogue}>
             Skip
           </button>
         </div>
@@ -252,269 +181,81 @@ export default function Level1() {
   }
 
   return (
-    <div className="level1-container" style={{ 
-      position: 'relative',
-      width: '100%',
-      minWidth: '1800px',
-      height: '100vh',
-      overflow: 'hidden',
-      backgroundColor: 'var(--background)'
-    }}>
+    <div className="level1-container">
       {showTutorial && <Level1Tutorial onComplete={() => setShowTutorial(false)} />}
-      <style>{blinkAnimation}</style>
-      <div className="level1-header" style={{ 
-        position: 'absolute', 
-        top: 0, 
-        width: '100%',
-        padding: '1rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 10
-      }}>
-        <button 
-          className="back-button" 
-          onClick={() => navigate("/home")}
-          style={{
-            padding: '0.5rem 1rem',
-            marginLeft: '2rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
+      <div className="level1-header">
+        <button className="back-button" onClick={() => navigate("/home")}>
           Back to Home
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            borderRadius: '5px',
-            fontWeight: 'bold'
-          }}>
-            Score: {score}
-          </div>
-          <h1 style={{
-            marginRight: '2rem',
-            padding: '0.5rem 1rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            borderRadius: '5px'
-          }}>
-            {levelData.metadata.levelName}
-          </h1>
+        <div className="header-right">
+          <div className="score-display">Score: {score}</div>
+          <h1 className="level-title">{levelData.metadata.levelName}</h1>
         </div>
       </div>
       
-      <div className="image-container" style={{ 
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <img 
-          src="/assets/level1_map2.jpeg" 
-          alt="Tileset" 
-          style={{ 
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain'
-          }}
-        />
+      <div className="image-container">
+        <img  className="background-level1" src="/assets/level1_map2.jpeg" alt="Tileset" />
         <img 
           src="/assets/character.png" 
           alt="Character" 
-          className="player-character"
+          className={`player-character ${isMoving ? 'moving' : ''}`}
           style={{ 
-            position: 'absolute',
-            width: '60px',
-            height: 'auto',
             top: isMoving ? nextCoord.top : currentCoord.top,
-            left: isMoving ? nextCoord.left : currentCoord.left,
-            transform: 'translate(-50%, -50%)',
-            zIndex: 5,
-            cursor: 'pointer',
-            transition: 'all 2s ease-in-out',
-            filter: isMoving ? 'drop-shadow(0 0 10px var(--primary))' : 'none',
-            pointerEvents: isMoving ? 'none' : 'auto'
+            left: isMoving ? nextCoord.left : currentCoord.left
           }}
           onClick={() => !isMoving && setShowQuestion(true)}
         />
-        {/* Click Here Prompt with Arrow */}
         <div 
+          className={`click-prompt ${isMoving ? 'moving' : ''}`}
           style={{ 
-            position: 'absolute',
             top: `calc(${isMoving ? nextCoord.top : currentCoord.top} - 150px)`,
-            left: isMoving ? nextCoord.left : currentCoord.left,
-            transform: 'translateX(-50%)',
-            zIndex: 6,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            transition: 'all 2s ease-in-out',
-            opacity: isMoving ? 0 : 1,
-            pointerEvents: isMoving ? 'none' : 'auto'
+            left: isMoving ? nextCoord.left : currentCoord.left
           }}
         >
-          <div style={{ 
-            color: '#FF0000',
-            fontWeight: 'bold',
-            fontSize: '1.2rem',
-            animation: 'blink 1.5s infinite',
-            textShadow: '0 0 3px rgba(0,0,0,0.5)',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            padding: '0.5rem 1rem',
-            borderRadius: '5px',
-            backdropFilter: 'blur(2px)'
-          }}>
-            Click Here
-          </div>
-          <div style={{ 
-            fontSize: '1.5rem',
-            marginTop: '0.5rem',
-            animation: 'blink 1.5s infinite',
-            color: '#FF0000',
-            textShadow: '0 0 3px rgba(0,0,0,0.5)',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            padding: '0.2rem 0.5rem',
-            borderRadius: '5px',
-            backdropFilter: 'blur(2px)'
-          }}>
-            ↓
-          </div>
+          <div className="click-text">Click Here</div>
+          <div className="click-arrow">↓</div>
         </div>
       </div>
 
-      {/* Question Popup */}
       {showQuestion && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'var(--card)',
-          padding: '2.5rem',
-          borderRadius: '10px',
-          zIndex: 100,
-          width: '800px',
-          maxWidth: '90vw',
-          textAlign: 'left',
-          maxHeight: '80vh',
-          overflowY: 'auto',
-          boxShadow: '0 0 20px rgba(0,0,0,0.3)'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            cursor: 'pointer',
-            fontSize: '1.5rem',
-            color: 'var(--primary-foreground)'
-          }} onClick={() => setShowQuestion(false)}>
+        <div className="question-popup">
+          <div className="question-popup-close" onClick={() => setShowQuestion(false)}>
             ×
           </div>
           
-          {/* Title */}
-          <div style={{
-            fontSize: '1.5rem',
-            fontWeight: 'bold',
-            marginBottom: '1rem',
-            color: 'var(--primary)'
-          }}>
+          <div className="question-title">
             {currentQuestion.title}
           </div>
 
-          {/* Narrative */}
-          <div style={{ 
-            marginBottom: '1.5rem',
-            whiteSpace: 'pre-line',
-            lineHeight: '1.6'
-          }}>
+          <div className="question-narrative">
             {currentQuestion.narrative}
           </div>
 
-          {/* Code Block */}
-          <div style={{
-            backgroundColor: 'var(--input)',
-            padding: '1rem',
-            borderRadius: '5px',
-            margin: '1rem 0',
-            fontFamily: 'monospace',
-            color: '#00ff00'
-          }}>
+          <div className="code-block">
             <pre>{currentQuestion.code}</pre>
           </div>
 
-          {/* Question */}
-          <div style={{
-            marginBottom: '1.5rem',
-            fontSize: '1.1rem'
-          }}>
+          <div className="question-text">
             {currentQuestion.question}
           </div>
 
-          {/* Hint Button */}
           {!hintUsed && (
-            <button
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: 'var(--secondary)',
-                color: 'var(--primary-foreground)',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginBottom: '1rem',
-                fontSize: '0.9rem',
-                transition: 'background-color 0.3s ease'
-              }}
-              onClick={handleHintClick}
-            >
+            <button className="hint-button" onClick={handleHintClick}>
               Need a Hint? (-5 points)
             </button>
           )}
 
-          {/* Hint Display */}
           {showHint && (
-            <div style={{
-              marginBottom: '1.5rem',
-              padding: '1rem',
-              backgroundColor: 'rgba(33, 150, 243, 0.1)',
-              border: '1px solid var(--secondary)',
-              borderRadius: '5px',
-              color: 'var(--secondary)'
-            }}>
+            <div className="hint-display">
               <strong>Hint:</strong> {currentQuestion.hint}
             </div>
           )}
 
-          {/* Options */}
-          <div style={{
-            display: 'grid',
-            gap: '1rem',
-            marginBottom: '2rem'
-          }}>
+          <div className="options-grid">
             {currentQuestion.options.map((option) => (
               <button
                 key={option.id}
-                style={{
-                  padding: '1rem',
-                  backgroundColor: userAnswer === option.id ? 'var(--primary)' : 'var(--input)',
-                  color: userAnswer === option.id ? 'var(--primary-foreground)' : 'var(--foreground)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.3s ease'
-                }}
+                className={`option-button ${userAnswer === option.id ? 'selected' : ''}`}
                 onClick={() => setUserAnswer(option.id)}
               >
                 {option.text}
@@ -522,67 +263,28 @@ export default function Level1() {
             ))}
           </div>
 
-          {/* Submit Button */}
           <button
-            style={{
-              padding: '0.8rem 1.5rem',
-              backgroundColor: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              transition: 'background-color 0.3s ease'
-            }}
+            className="submit-button"
             onClick={handleAnswerSubmit}
             disabled={!userAnswer}
           >
             Submit Answer
           </button>
 
-          {/* Feedback */}
           {showSuccess && (
-            <div style={{
-              marginTop: '1.5rem',
-              padding: '1rem',
-              backgroundColor: 'rgba(0, 255, 0, 0.1)',
-              border: '1px solid #00ff00',
-              borderRadius: '5px',
-              color: '#00ff00'
-            }}>
+            <div className="feedback-success">
               {currentQuestion.feedback.success}
             </div>
           )}
 
           {showWrongAnswer && (
-            <div style={{
-              marginTop: '1.5rem',
-              padding: '1rem',
-              backgroundColor: 'rgba(255, 0, 0, 0.1)',
-              border: '1px solid #ff0000',
-              borderRadius: '5px',
-              color: '#ff0000'
-            }}>
+            <div className="feedback-failure">
               {currentQuestion.feedback.failure}
             </div>
           )}
 
-          {/* Next Button */}
           {showSuccess && (
-            <button
-              style={{
-                marginTop: '1.5rem',
-                padding: '0.8rem 1.5rem',
-                backgroundColor: 'var(--secondary)',
-                color: 'var(--secondary-foreground)',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-                transition: 'background-color 0.3s ease'
-              }}
-              onClick={handleNextPosition}
-            >
+            <button className="next-button" onClick={handleNextPosition}>
               Continue
             </button>
           )}
