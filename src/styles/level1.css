@@ -25,6 +25,7 @@
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+
 }
 
 .back-button {
@@ -37,22 +38,59 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
+.header-right{
+  display:block;
+  align-items: center;
+  justify-items: center;
+}
 .score-display {
   padding: 0.5rem 1rem;
   background-color: #4a148c;
   color: var(--primary-foreground);
     border-radius: 5px;
   font-weight: bold;
-  margin-bottom: 10px;
-  text-align: center;
+  height: fit-content;
 }
+.lives-display {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-container {
+  margin: 5px;
+  position: relative;
+  display: inline-block;
+  left: 20%;
+}
+
+.heart-image {
+  width: 50px; /* adjust as needed */
+  height: auto;
+}
+
+.lives-count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: white;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px black;
+}
+
 
 .level-title {
   padding: 0.5rem 1rem;
   background-color: #4a148c;
   color: var(--primary-foreground);
-    border-radius: 5px;
+    border-radius: 15px;
+    font-size: 3.5rem;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    align-items: center;
 }
 
 /* Image Container */
@@ -401,4 +439,19 @@
   background-color: rgba(0, 0, 0, 0.2);
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
+}
+
+/*remaining lives*/
+.no-remaining-lives{
+  background-color: #4a148c;
+  color: white;
+  width: fit-content;
+font-weight: bold;
+  padding: 5px;
+  position: absolute;
+  top:15%;
+  right: 0%;
+  border-radius: 10px;
+  z-index: 10;
+  transition: opacity 1s ease-out;
 }

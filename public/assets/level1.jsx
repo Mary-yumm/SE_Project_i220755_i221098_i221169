@@ -100,16 +100,6 @@ export default function Level1() {
     return () => clearInterval(interval);
   }, [timerActive, timeLeft]);
 
-  useEffect(() => {
-    if (remainingLives <= 0) {
-      setTimerActive(false);
-      setShowWrongAnswer(true);
-      setShowQuestion(false);  // Close the question popup when lives reach 0
-      alert("Game Over! You have no lives left.");
-      navigate("/level1"); // Redirect the user if needed
-    }
-  }, [remainingLives, navigate]);
-  
   const handleTimeUp = async () => {
     setTimerActive(false);
     setShowWrongAnswer(true);
@@ -159,9 +149,6 @@ export default function Level1() {
       });
     } else {
       setShowWrongAnswer(true);
-    const lives = remainingLives-1;
-      setRemainingLives(lives);
-    
       setUserAnswer("");
 
       const newScore = score + scoringData.questionPoints.incorrect;
@@ -287,11 +274,9 @@ export default function Level1() {
         <div className="header-right">
           <div className="score-display">Score: {score}</div>
           <div className="lives-display">
-            <div className="heart-container">
-              <img src="/assets/heart-full.png" className="heart-image" />
-              <p className="lives-count">{remainingLives}</p>
-            </div>
+            <img src="/assets/heart-full.png"/>
           </div>
+
         </div>
       </div>
 
@@ -310,15 +295,12 @@ export default function Level1() {
             left: isMoving ? nextCoord.left : currentCoord.left,
           }}
           onClick={() => {
-            if (remainingLives > 0 && !isMoving) { // Add the check for remaining lives
+            if (!isMoving) {
               setShowQuestion(true);
               if (withTimer) {
                 setTimeLeft(30);
                 setTimerActive(true);
               }
-            }
-            else if (remainingLives <= 0) {
-              alert("Game Over! You have no lives left.");
             }
           }}
         />
