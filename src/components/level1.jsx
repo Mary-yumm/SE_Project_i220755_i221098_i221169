@@ -13,6 +13,7 @@ import Level1Tutorial from "./Level1Tutorial";
 
 // Define the coordinates for question positions
 const COORDINATES = [
+  { top: "75%", left: "30%" },
   { top: "45%", left: "31%" },
   { top: "40%", left: "39%" },
   { top: "25%", left: "57%" },
@@ -27,7 +28,7 @@ const TimerSelection = ({ onSelect }) => {
         <p>Would you like to play with a timer?</p>
         <div className="timer-options">
           <button onClick={() => onSelect(true)}>
-            With Timer (30s per question)
+            With Timer (60s per question)
           </button>
           <button onClick={() => onSelect(false)}>Without Timer</button>
         </div>
@@ -54,16 +55,26 @@ export default function Level1() {
   const [memoryViolations, setMemoryViolations] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(true);
+
+  const [showTutorial, setShowTutorial] = useState(() => {
+    const tutorialShown = sessionStorage.getItem("level1_tutorial_shown");
+    return !tutorialShown;
+  });
+
+  //gameover
+  const [showGameOverPopup, setShowGameOverPopup] = useState(false);
 
   //timer
   const [withTimer, setWithTimer] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
 
   //lives
-  const [remainingLives, setRemainingLives] = useState(3);
 
+  const [remainingLives, setRemainingLives] = useState(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    return isNaN(savedLives) ? 3 : savedLives;
+  });
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
   const scoringData = levelData.scoring;
@@ -101,21 +112,55 @@ export default function Level1() {
   }, [timerActive, timeLeft]);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+      const lastLost = parseInt(localStorage.getItem("lastLifeLost"), 10);
+
+      if (!isNaN(savedLives) && savedLives < 3 && !isNaN(lastLost)) {
+        const now = Date.now();
+        if (now - lastLost >= 60000) {
+          // 1 minute
+          const updatedLives = savedLives + 1;
+          if (updatedLives <= 3) setRemainingLives(updatedLives);
+          localStorage.setItem("remainingLives", updatedLives);
+
+          if (updatedLives < 3) {
+            localStorage.setItem("lastLifeLost", now); // reset timer for next life
+          } else {
+            localStorage.removeItem("lastLifeLost"); // clear if full
+          }
+        }
+      }
+    }, 10000); // check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    if (!isNaN(savedLives)) {
+      setRemainingLives(savedLives);
+    }
+  }, []);
+  useEffect(() => {
     if (remainingLives <= 0) {
       setTimerActive(false);
       setShowWrongAnswer(true);
-      setShowQuestion(false);  // Close the question popup when lives reach 0
-      alert("Game Over! You have no lives left.");
-      navigate("/level1"); // Redirect the user if needed
+      setShowGameOverPopup(true);
+      setShowQuestion(false);
+      setTimeout(() => {
+        setShowGameOverPopup(false);
+        navigate("/level1");
+      }, 1000);
     }
   }, [remainingLives, navigate]);
-  
+
   const handleTimeUp = async () => {
     setTimerActive(false);
     setShowWrongAnswer(true);
 
     const newScore = score + scoringData.questionPoints.incorrect;
-    setScore(newScore);
+    if (newScore >= 0) setScore(newScore);
     await updateUserScore("level1", newScore);
     await logActivity("time_up", {
       level: "level1",
@@ -159,13 +204,17 @@ export default function Level1() {
       });
     } else {
       setShowWrongAnswer(true);
-    const lives = remainingLives-1;
+      const lives = remainingLives - 1;
       setRemainingLives(lives);
-    
+      localStorage.setItem("remainingLives", lives);
+      if (lives < 3) {
+        localStorage.setItem("lastLifeLost", Date.now());
+      }
+
       setUserAnswer("");
 
       const newScore = score + scoringData.questionPoints.incorrect;
-      setScore(newScore);
+      if (newScore >= 0) setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("incorrect_answer", {
         level: "level1",
@@ -180,7 +229,7 @@ export default function Level1() {
     if (!showSuccess) return;
 
     setTimerActive(false);
-    setTimeLeft(30);
+    setTimeLeft(60);
     setShowSuccess(false);
     setShowExplanation(false);
     setShowQuestion(false);
@@ -260,7 +309,14 @@ export default function Level1() {
   }
 
   if (showTutorial) {
-    return <Level1Tutorial onComplete={() => setShowTutorial(false)} />;
+    return (
+      <Level1Tutorial
+        onComplete={() => {
+          sessionStorage.setItem("level1_tutorial_shown", "true");
+          setShowTutorial(false);
+        }}
+      />
+    );
   }
 
   if (withTimer === null) {
@@ -269,7 +325,7 @@ export default function Level1() {
         onSelect={(choice) => {
           setWithTimer(choice);
           if (choice) {
-            setTimeLeft(30);
+            setTimeLeft(60);
             setTimerActive(true);
           }
         }}
@@ -283,9 +339,11 @@ export default function Level1() {
         <button className="back-button" onClick={() => navigate("/home")}>
           Back to Home
         </button>
-        <h1 className="level-title">{levelData.metadata.levelName}</h1>
         <div className="header-right">
-          <div className="score-display">Score: {score}</div>
+          <div className="score-display">
+            <img src="/assets/dollar.png" className="coin-image" />
+            {score}
+          </div>
           <div className="lives-display">
             <div className="heart-container">
               <img src="/assets/heart-full.png" className="heart-image" />
@@ -310,15 +368,20 @@ export default function Level1() {
             left: isMoving ? nextCoord.left : currentCoord.left,
           }}
           onClick={() => {
-            if (remainingLives > 0 && !isMoving) { // Add the check for remaining lives
+            if (remainingLives > 0 && !isMoving) {
+              // Add the check for remaining lives
               setShowQuestion(true);
               if (withTimer) {
-                setTimeLeft(30);
+                setTimeLeft(60);
                 setTimerActive(true);
               }
-            }
-            else if (remainingLives <= 0) {
-              alert("Game Over! You have no lives left.");
+            } else if (remainingLives <= 0) {
+              setShowGameOverPopup(true);
+
+              setTimeout(() => {
+                setShowGameOverPopup(false);
+                navigate("/level1");
+              }, 1000);
             }
           }}
         />
@@ -411,10 +474,11 @@ export default function Level1() {
           )}
         </div>
       )}
-      {(showSuccess || showWrongAnswer) && (
-        <button className="next-button" onClick={handleNextPosition}>
-          Continue
-        </button>
+
+      {showGameOverPopup && (
+        <div className="game-over-popup">
+          <p>Game Over! You have no lives left.</p>
+        </div>
       )}
     </div>
   );

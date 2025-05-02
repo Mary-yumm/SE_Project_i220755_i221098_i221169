@@ -13,79 +13,98 @@
     "questions": [
       {
         "id": "q1",
-        "position": { "x": 2, "y": 2 },
-        "title": "The Shadows of Templates",
-        "narrative": "You enter a glowing cave. On a stone table are two magical doors: One only accepts items of the same type.\n\nYou find:\n🍎 A red apple marked 3\n🔮 A crystal marked 4.5",
-        "code": "template<typename T>\nT mystery(T a, T b) {\n    return (a > b) ? a : b;\n}\n\n// You try:\nmystery(3, 4.5);",
-        "question": "What happens when you try to use the magic word?",
+        "position": { "x": 12, "y": 5 },
+        "title": "The String Maze",
+        "narrative": "You enter a shimmering library filled with scrolls. A glowing orb hums above a locked door. One scroll lies open:\n\n\"To pass, assign wisely. One is deep, one is shallow. Confuse them, and you'll remain.\"",
+        "code": "#include <iostream>\n#include <string>\n\nint main() {\n    std::string a = \"Brave\";\n    std::string b = a;\n    b[0] = 'C';\n    std::cout << a << std::endl;\n    return 0;\n}",
+        "question": "What is the output of the above code?",
         "options": [
-          { "id": "a", "text": "The door sees both values and lets the bigger one through", "correct": false },
-          { "id": "b", "text": "The door stops — it needs both items to be of the same kind", "correct": true },
-          { "id": "c", "text": "The door mixes the items into something else", "correct": false },
-          { "id": "d", "text": "The door crashes with smoke", "correct": false }
+          { "id": "a", "text": "Brave", "correct": true },
+          { "id": "b", "text": "Crave", "correct": false },
+          { "id": "c", "text": "Compile Error", "correct": false },
+          { "id": "d", "text": "Undefined Behavior", "correct": false }
         ],
         "feedback": {
-          "success": "Correct! Just like in C++ templates, the door (function) can't decide what type to use if the items (arguments) are different. So it refuses to open.",
-          "failure": "Incorrect. The door = template function. The two items = arguments. They must be the same type (both apples or both crystals) to work."
+          "success": "Correct! `std::string` performs deep copy on assignment. Changing `b` doesn’t affect `a`.",
+          "failure": "Not quite. `std::string` uses deep copy semantics—`a` remains unchanged when `b` is modified."
         },
-        "hint": "In C++ templates, both arguments must be of the same type. The function can't work with mixed types like an integer and a float."
+        "hint": "Think about how C++ strings handle assignment: are they shared or copied?"
       },
       {
         "id": "q2",
-        "position": { "x": 7, "y": 2 },
-        "title": "The Inferno of Pointers",
-        "narrative": "You walk into a cave filled with lava. On a stone platform sits a magic cube labeled a = 5.\n\nYou see three levers:\nLever 1 controls a rope (this is like pointer p to the cube)\nLever 2 is tied to the first lever (like pointer q to p)",
-        "code": "int a = 5;\nint* p = &a;\nint** q = &p;\n**q = 10;",
-        "question": "What happens when you pull Lever 2 all the way down?",
+        "position": { "x": 2, "y": 2 },
+        "title": "The Shadows of Functions",
+        "narrative": "You enter a glowing cave. On a stone table are two magic scrolls:\n\nOne scroll changes when you whisper 'int'. Another when you whisper 'float'. But there's a third scroll that copies the others magically — a template scroll.\n\nYou try:",
+        "code": "int add(int a, int b) { return a + b; }\ntemplate<typename T>\nT add(T a, T b) { return a + b; }\n\nadd(2, 3);",
+        "question": "Which scroll activates when you speak the words 'add(2, 3)'?",
         "options": [
-          { "id": "a", "text": "It directly changes the cube's value", "correct": true },
-          { "id": "b", "text": "It breaks the rope and nothing happens", "correct": false },
-          { "id": "c", "text": "The cube vanishes into lava", "correct": false },
-          { "id": "d", "text": "Only Lever 1 moves but the cube stays the same", "correct": false }
+          { "id": "a", "text": "The hand-written scroll for int", "correct": true },
+          { "id": "b", "text": "The template scroll", "correct": false },
+          { "id": "c", "text": "Both scrolls activate", "correct": false },
+          { "id": "d", "text": "No scrolls match", "correct": false }
         ],
         "feedback": {
-          "success": "Correct! In C++, **q = 10; means: follow pointer q to pointer p, then change the value a. You pulled the top lever and it changed the cube below!",
-          "failure": "Incorrect. Cube = variable a, rope = pointer. You didn't touch the cube directly — you controlled it through ropes (pointers)."
+          "success": "Correct! The compiler chooses the exact match (non-template) first.",
+          "failure": "Incorrect. If a function exactly matches the arguments, it is chosen over the template."
         },
-        "hint": "Double pointers (**q) can access the value they point to by following the chain: first to the pointer (p), then to the value (a)."
+        "hint": "C++ prefers exact matches over templates if available."
       },
       {
         "id": "q3",
-        "position": { "x": 4, "y": 4 },
-        "title": "The Frost of Memory",
-        "narrative": "You step into a frozen cave. On a crystal pedestal lies a scroll and a sealed chest made of ice shards.\n\nThe scroll reads:\nTo open the chest, melt all the shards you summoned... the same way they were created.",
-        "code": "char* p = new char[10];\nstrcpy(p, \"Questoria\");\ndelete p;",
-        "question": "What happens when you try to open the chest?",
+        "position": { "x": 7, "y": 2 },
+        "title": "The Inferno of Pointers",
+        "narrative": "You walk into a cave filled with lava. On a stone platform sits a magic cube labeled a = 5.\n\nYou see two ropes:\nRope 1 connects to the cube (like pointer `p` to `a`)\nRope 2 connects to the first rope (like pointer `q` to `p`)",
+        "code": "int a = 5;\nint* p = &a;\nint** q = &p;\n**q = 10;",
+        "question": "What happens when you pull Rope 2?",
         "options": [
-          { "id": "a", "text": "The chest melts and reveals the treasure", "correct": false },
-          { "id": "b", "text": "Only one shard melts, the rest stay", "correct": false },
-          { "id": "c", "text": "You leave behind magical ice pieces", "correct": false },
-          { "id": "d", "text": "The chest reacts badly and cracks dangerously", "correct": true }
+          { "id": "a", "text": "It directly changes the cube's value", "correct": true },
+          { "id": "b", "text": "Nothing happens", "correct": false },
+          { "id": "c", "text": "The cube vanishes", "correct": false },
+          { "id": "d", "text": "Only Rope 1 moves", "correct": false }
         ],
         "feedback": {
-          "success": "Correct! You used new[] to summon multiple shards (array), but delete melts only one. That's incorrect — it causes weird behavior.",
-          "failure": "Incorrect. The ice chest = array of characters. You summoned multiple (new[]) — but destroyed only one (delete) instead of all (delete[])."
+          "success": "Correct! `**q = 10;` reaches through both ropes and changes `a`.",
+          "failure": "Incorrect. You used a double pointer — you reached all the way to `a`."
         },
-        "hint": "When you allocate an array with new[], you must use delete[] to free all the memory. Using just delete will only free the first element."
+        "hint": "Double pointers follow two levels: from `q` to `p`, then `p` to `a`."
       },
       {
         "id": "q4",
-        "position": { "x": 9, "y": 9 },
-        "title": "The Final Trial – Polymorphix Abyss",
-        "narrative": "You reach the final chamber. In the center, a treasure chest floats in a magic bubble. Two statues stand beside it:\n\nOne says \"Base\"\nOne says \"Derived\"\n\nThey chant:\n\"To claim the treasure, clean up all that you summon. Start at the top, but don't forget what lies beneath.\"",
-        "code": "class Base {\npublic:\n    ~Base() { std::cout << \"Base destroyed\\n\"; }\n};\n\nclass Derived : public Base {\npublic:\n    ~Derived() { std::cout << \"Derived destroyed\\n\"; }\n};\n\nBase* b = new Derived();\ndelete b;",
-        "question": "What happens when you speak the magic words?",
+        "position": { "x": 4, "y": 4 },
+        "title": "The Frost of Memory",
+        "narrative": "You step into a frozen cave. A row of magical ice crystals appears when you speak 'new'.\n\nBut to destroy them, you must use the same kind of magic.",
+        "code": "char* p = new char[10];\nstrcpy(p, \"Quest\");\ndelete p;",
+        "question": "What happens when you try to destroy the crystals with 'delete'?",
         "options": [
-          { "id": "a", "text": "Only the top statue (Base) was removed", "correct": true },
-          { "id": "b", "text": "Both statues vanish", "correct": false },
-          { "id": "c", "text": "The code fails to run", "correct": false },
-          { "id": "d", "text": "The room fills with ghost data", "correct": false }
+          { "id": "a", "text": "All crystals melt perfectly", "correct": false },
+          { "id": "b", "text": "Only one crystal melts, others remain", "correct": false },
+          { "id": "c", "text": "You leave behind frozen memory", "correct": false },
+          { "id": "d", "text": "A memory error happens — wrong spell used", "correct": true }
         ],
         "feedback": {
-          "success": "Correct! You deleted the object using a Base pointer, but the Base destructor wasn't virtual. So Derived's cleanup never happened — treasure lost!",
-          "failure": "Incorrect. Statues = objects. If you want to fully destroy a Derived object through a Base pointer, you need a virtual destructor."
+          "success": "Correct! You used `new[]`, so you must use `delete[]` — using `delete` causes undefined behavior.",
+          "failure": "Incorrect. You must match `new[]` with `delete[]` — or risk memory leaks and corruption."
         },
-        "hint": "When deleting a derived class through a base class pointer, the base class destructor must be virtual to ensure the derived destructor is called."
+        "hint": "Always match `new[]` with `delete[]`, not plain `delete`."
+      },
+      {
+        "id": "q5",
+        "position": { "x": 9, "y": 9 },
+        "title": "The Polymorph Abyss",
+        "narrative": "In a glowing bubble, two statues guard a treasure. One is labeled 'Base', the other 'Derived'.\n\nThe scroll says: 'Start at the top, but don’t forget the one below... unless you forget to mark it virtual.'",
+        "code": "class Base {\npublic:\n    ~Base() { std::cout << \"Base destroyed\\n\"; }\n};\n\nclass Derived : public Base {\npublic:\n    ~Derived() { std::cout << \"Derived destroyed\\n\"; }\n};\n\nBase* b = new Derived();\ndelete b;",
+        "question": "What happens when you delete `b`?",
+        "options": [
+          { "id": "a", "text": "Only Base is destroyed", "correct": true },
+          { "id": "b", "text": "Both Base and Derived are destroyed", "correct": false },
+          { "id": "c", "text": "Nothing is destroyed", "correct": false },
+          { "id": "d", "text": "Destruction order is reversed", "correct": false }
+        ],
+        "feedback": {
+          "success": "Correct! Without a virtual destructor in Base, the Derived destructor is not called.",
+          "failure": "Incorrect. You must declare the base class destructor as `virtual` to clean up Derived."
+        },
+        "hint": "Use `virtual ~Base()` if you want proper cleanup via a base pointer."
       }
     ]
   },

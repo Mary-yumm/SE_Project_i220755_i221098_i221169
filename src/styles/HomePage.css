@@ -287,30 +287,51 @@ button {
   z-index: 1000;
 }
 
-.island-image {
-  width: 300px;  /* Increased width */
-  height: 400px; /* Increased height proportionally */
-  border-radius: 10px;
+
+.level:hover .island-image,
+.level:hover .island-name {
+  transform: scale(1.1);
+}
+
+.level-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: transform 0.3s ease;
-  object-fit: cover; /* This ensures the image covers the area without distortion */
+  position: relative;
+  z-index: 1;
+}
+
+.level:hover .level-image-wrapper {
+  transform: scale(1.1);
 }
 
 .island-name {
   font-size: 20px;
   font-weight: bold;
   color: var(--foreground);
-  margin-bottom: 10px; /* Space between name and image */
+  margin-bottom: 15px;
   transition: transform 0.3s ease;
+  z-index: 2; /* Ensures it's on top */
 }
 
-.level:hover .island-image,
-.level:hover .island-name {
-  transform: scale(1.1);
+.level-image-container {
+  position: relative;
+  z-index: 1;
 }
+
+.island-image {
+  width: 300px;
+  height: 400px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
 .level-description {
-  font-size: 14px;
+  font-size: 10px;
   color: var(--foreground);
-  margin-top: 15px; /* Space between image and description */
+  margin-top: 15px; 
 }
 .profile-icon {
   font-size: 16px; /* Reduced from 22px */

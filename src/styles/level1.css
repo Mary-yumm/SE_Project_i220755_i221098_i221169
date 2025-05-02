@@ -50,6 +50,9 @@
     border-radius: 5px;
   font-weight: bold;
   height: fit-content;
+  width: fit-content;
+  font-size: 1rem;
+  display: flex;  
 }
 .lives-display {
   display: flex;
@@ -454,4 +457,32 @@ font-weight: bold;
   border-radius: 10px;
   z-index: 10;
   transition: opacity 1s ease-out;
+}
+
+/*coin image*/
+.coin-image{
+  position: relative;
+  align-self: center;
+  padding-right:10px;
+}
+/*no remaining lives*/
+.game-over-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4a148c;
+  color: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  z-index: 1000;
+  animation: fadeOut 10s forwards;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeOut {
+  0%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
 }

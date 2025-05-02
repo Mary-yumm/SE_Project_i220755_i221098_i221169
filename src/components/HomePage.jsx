@@ -10,7 +10,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showTutorial, setShowTutorial] = useState(true); // Always start with tutorial shown
+  const [showTutorial, setShowTutorial] = useState(true); 
   const navigate = useNavigate();
 
   // Check if user is logged in and fetch progress
@@ -21,6 +21,13 @@ export default function HomePage() {
         try {
           const progress = await getUserProgress();
           setUserProgress(progress);
+          const tutorialShown = sessionStorage.getItem("tutorialShown");
+          if (!tutorialShown) {
+            setShowTutorial(true);
+            sessionStorage.setItem("tutorialShown", "true");
+          } else {
+            setShowTutorial(false);
+          }
         } catch (error) {
           console.error("Error fetching user progress:", error);
         }
@@ -107,11 +114,12 @@ export default function HomePage() {
 
       {/* Islands (Levels) */}
       <div className="levels-container">
-        <div 
+        <div className="level-image-wrapper">
+        <div
           className={`level ${isLevelUnlocked('level1') ? 'unlocked' : 'locked'}`}
           onClick={() => handleLevelClick('/level1')}
         >
-          <h3 className="island-name">Questoria</h3>
+          <h3 className="island-name">The Cave of C++</h3>
           <div className="level-image-container">
             <img
               src="/assets/island01.webp"
@@ -128,7 +136,7 @@ export default function HomePage() {
             Level 1 <br /> Begin your adventure here🌿
           </p>
         </div>
-
+        </div>
         <div 
           className={`level ${isLevelUnlocked('level2') ? 'unlocked' : 'locked'}`}
           onClick={() => handleLevelClick('/level2')}
