@@ -141,7 +141,7 @@ export default function HomePage() {
           className={`level ${isLevelUnlocked('level2') ? 'unlocked' : 'locked'}`}
           onClick={() => handleLevelClick('/level2')}
         >
-          <h3 className="island-name">Frosthaven</h3>
+          <h3 className="island-name">The Pythonic Labyrinth </h3>
           <div className="level-image-container">
             <img
               src="/assets/island2.jpg"
@@ -163,7 +163,7 @@ export default function HomePage() {
           className={`level ${isLevelUnlocked('level3') ? 'unlocked' : 'locked'}`}
           onClick={() => handleLevelClick('/level3')}
         >
-          <h3 className="island-name">Embervale</h3>
+          <h3 className="island-name">The Trial of Lost Semicolons</h3>
           <div className="level-image-container">
             <img
               src="/assets/island03.PNG"

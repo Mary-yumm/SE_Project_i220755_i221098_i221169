@@ -1,0 +1,274 @@
+{
+    "metadata": {
+      "levelId": "java_level2",
+      "levelName": "The Trial of Lost Semicolons",
+      "version": "2.0",
+      "createdAt": "2025-05-04",
+      "updatedAt": "2025-05-04",
+      "difficulty": "expert",
+      "estimatedTime": 45,
+      "topics": [
+        "concurrency",
+        "streams",
+        "generics",
+        "annotations",
+        "records",
+        "modules",
+        "lambdas",
+        "design patterns",
+        "interfaces",
+        "memory"
+      ]
+    },
+    "puzzles": {
+      "questions": [
+        {
+          "id": "q1",
+          "position": { "x": 1, "y": 3 },
+          "title": "The Threaded Labyrinth",
+          "narrative": "To pass the gate, synchronize your spirit with the thread realm.",
+          "code": "Thread t = new Thread(() -> {\n    // missing line\n});\nt.start();",
+          "question": "Which line allows this thread to safely print its name?",
+          "options": [
+            { "id": "a", "text": "System.out.println(Thread.currentThread().getName());", "correct": true },
+            { "id": "b", "text": "System.out.println(t.getName());", "correct": false },
+            { "id": "c", "text": "print(Thread.name);", "correct": false },
+            { "id": "d", "text": "System.print(Thread.getCurrentThreadName());", "correct": false }
+          ],
+          "feedback": {
+            "success": "Perfect. You summoned the current thread correctly.",
+            "failure": "Threads must refer to themselves using `Thread.currentThread()`."
+          },
+          "hint": "Use `Thread.currentThread()` inside the lambda."
+        },
+        {
+          "id": "q2",
+          "position": { "x": 2, "y": 4 },
+          "title": "Generics of the Arcane Vault",
+          "narrative": "Only the correct generic signature will unlock the artifact.",
+          "code": "public class SpellBox<T extends Magic> {\n    private T spell;\n    public void cast() {\n        // missing line\n    }\n}",
+          "question": "Which line safely calls a method from Magic?",
+          "options": [
+            { "id": "a", "text": "spell.invoke();", "correct": true },
+            { "id": "b", "text": "((Magic) spell).invoke();", "correct": false },
+            { "id": "c", "text": "cast(spell);", "correct": false },
+            { "id": "d", "text": "T.invoke();", "correct": false }
+          ],
+          "feedback": {
+            "success": "Correct. `T extends Magic` means `spell.invoke()` is type-safe.",
+            "failure": "You don't need to cast if T is bounded by Magic."
+          },
+          "hint": "The generic type `T` already guarantees `invoke()` is valid."
+        },
+        {
+          "id": "q3",
+          "position": { "x": 3, "y": 5 },
+          "title": "Stream of Lost Souls",
+          "narrative": "You must collect the whispers of the dead — but only those with meaning.",
+          "code": "List<String> runes = List.of(\"\", \"Ignis\", \"\", \"Lux\");\n// missing line",
+          "question": "Which line filters non-empty runes and collects them?",
+          "options": [
+            { "id": "a", "text": "List<String> filtered = runes.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());", "correct": true },
+            { "id": "b", "text": "List<String> filtered = runes.filter(s -> s.length > 0).collect();", "correct": false },
+            { "id": "c", "text": "runes.removeIf(s -> s.equals(\"\"));", "correct": false },
+            { "id": "d", "text": "List<String> filtered = runes.map(!s.isEmpty()).list();", "correct": false }
+          ],
+          "feedback": {
+            "success": "You summoned the `Stream` correctly!",
+            "failure": "Be sure you are calling `.stream()` and using proper lambda syntax."
+          },
+          "hint": "Use `.stream().filter(...).collect(...)` pattern."
+        },
+        {
+          "id": "q4",
+          "position": { "x": 4, "y": 2 },
+          "title": "The Annotation Glyph",
+          "narrative": "Mark your method correctly or the glyph will reject you.",
+          "code": "@Override\n// missing line\npublic void cast() {}",
+          "question": "What is the correct method signature here?",
+          "options": [
+            { "id": "a", "text": "public void cast()", "correct": true },
+            { "id": "b", "text": "private void cast()", "correct": false },
+            { "id": "c", "text": "void cast(int spell)", "correct": false },
+            { "id": "d", "text": "cast() void", "correct": false }
+          ],
+          "feedback": {
+            "success": "Correct! The annotation requires matching signature from a superclass or interface.",
+            "failure": "The `@Override` must match the parent method exactly."
+          },
+          "hint": "`@Override` requires exact name, parameters, and return type."
+        },
+        {
+          "id": "q5",
+          "position": { "x": 5, "y": 5 },
+          "title": "The Memory Pool",
+          "narrative": "Only the one who understands garbage collection can pass the river of references.",
+          "code": "Object orb = new Object();\norb = null;\nSystem.gc();",
+          "question": "What happens when `System.gc()` is called?",
+          "options": [
+            { "id": "a", "text": "The object may be collected, but it is not guaranteed.", "correct": true },
+            { "id": "b", "text": "The object is immediately destroyed.", "correct": false },
+            { "id": "c", "text": "GC throws an exception.", "correct": false },
+            { "id": "d", "text": "All memory is freed.", "correct": false }
+          ],
+          "feedback": {
+            "success": "Right! GC is only a *suggestion*, not a command.",
+            "failure": "`System.gc()` doesn’t guarantee immediate cleanup."
+          },
+          "hint": "Java's garbage collector works on its own schedule."
+        },
+        {
+          "id": "q6",
+          "position": { "x": 6, "y": 6 },
+          "title": "The Interface Oracle",
+          "narrative": "You must speak the functional prophecy.",
+          "code": "@FunctionalInterface\ninterface Enchantment {\n    String apply(String incantation);\n}\n\n// missing line",
+          "question": "Which lambda correctly implements `Enchantment`?",
+          "options": [
+            { "id": "a", "text": "Enchantment echo = s -> s + s;", "correct": true },
+            { "id": "b", "text": "Enchantment echo = (String s, int n) -> s.repeat(n);", "correct": false },
+            { "id": "c", "text": "Enchantment echo = () -> \"Lux\";", "correct": false },
+            { "id": "d", "text": "Enchantment echo = s -> return s;", "correct": false }
+          ],
+          "feedback": {
+            "success": "Well cast! The lambda matches the interface exactly.",
+            "failure": "The method must take one `String` and return a `String`."
+          },
+          "hint": "Match the exact method signature of the interface."
+        },
+        {
+          "id": "q7",
+          "position": { "x": 7, "y": 3 },
+          "title": "The Singleton Mirror",
+          "narrative": "A single reflection — no more, no less — holds the answer.",
+          "code": "// missing line\npublic class Portal {\n    private static final Portal INSTANCE = new Portal();\n    private Portal() {}\n    public static Portal getInstance() { return INSTANCE; }\n}",
+          "question": "Which design pattern is this an example of?",
+          "options": [
+            { "id": "a", "text": "Singleton", "correct": true },
+            { "id": "b", "text": "Factory", "correct": false },
+            { "id": "c", "text": "Builder", "correct": false },
+            { "id": "d", "text": "Prototype", "correct": false }
+          ],
+          "feedback": {
+            "success": "Exactly! Only one instance is allowed — the Singleton lives.",
+            "failure": "Look again. Only one instance is being created."
+          },
+          "hint": "Pattern restricts instantiation to one object."
+        },
+        {
+          "id": "q8",
+          "position": { "x": 8, "y": 4 },
+          "title": "The Record of Ancients",
+          "narrative": "Immutable truths are stored in records — can you decode one?",
+          "code": "// missing line\nrecord Spell(String name, int power) {}",
+          "question": "Which statement about this record is TRUE?",
+          "options": [
+            { "id": "a", "text": "It automatically provides a constructor and `toString()`.", "correct": true },
+            { "id": "b", "text": "It must implement Serializable.", "correct": false },
+            { "id": "c", "text": "It has mutable fields.", "correct": false },
+            { "id": "d", "text": "It cannot be instantiated.", "correct": false }
+          ],
+          "feedback": {
+            "success": "Correct. Records are concise, immutable data carriers.",
+            "failure": "Records are auto-generated and immutable by default."
+          },
+          "hint": "Records auto-generate methods and are immutable."
+        }
+    ]
+},
+"dialogue": {
+    "intro": [
+      "Welcome to the Trial of Missing Lines - Java Expert Edition!",
+      "This level challenges your knowledge of advanced Java features and design patterns.",
+      "Your task: Fill in the missing lines of Java code to make each snippet compile and function correctly.",
+      "Think like a Java architect and write clean, scalable code!"
+    ],
+    "completion": [
+      "Well done! You've completed the Trial of Missing Lines - Java Level 3!",
+      "Your deep understanding of Java shines through your solutions.",
+      "Continue mastering Java and building robust software solutions!"
+    ]
+  },
+  "visualSettings": {
+    "colors": {
+      "primary": "#3F51B5",
+      "secondary": "#FFC107",
+      "background": "#1A237E",
+      "text": "#E8EAF6"
+    },
+    "animations": {
+      "transitionSpeed": 0.5,
+      "highlightDuration": 1.0
+    }
+  },
+  "penalty": {
+    "memoryViolation": {
+      "points": 10,
+      "maxViolations": 3,
+      "description": "Each incorrect attempt costs 10 points. Exceeding 3 violations fails the level."
+    }
+  },
+  "scoring": {
+    "questionPoints": {
+      "correct": 20,
+      "incorrect": -5
+    },
+    "levelCompletion": 100,
+    "totalPossible": 200,
+    "minimumPassing": 120,
+    "hintPenalty": 5
+  },
+  "challenges": [
+    {
+      "id": "thread_synchronization",
+      "prompt": "Fill in the missing line to synchronize access to the shared resource.",
+      "code": [
+        "public class Counter {",
+        "    private int count = 0;",
+        "    public void increment() {",
+        "        // MISSING LINE",
+        "            count++;",
+        "        }",
+        "    }",
+        "}"
+      ],
+      "missingLines": [
+        "synchronized(this) {"
+      ]
+    },
+    {
+      "id": "generic_method",
+      "prompt": "Fill in the missing line to declare a generic method that returns the maximum element.",
+      "code": [
+        "public class Utils {",
+        "    // MISSING LINE",
+        "    public static <T extends Comparable<T>> T max(T a, T b) {",
+        "        return a.compareTo(b) > 0 ? a : b;",
+        "    }",
+        "}"
+      ],
+      "missingLines": [
+        "// Generic method to find maximum"
+      ]
+    },
+    {
+      "id": "try_with_resources",
+      "prompt": "Insert the correct line to use try-with-resources for closing the BufferedReader automatically.",
+      "code": [
+        "import java.io.*;",
+        "public class FileReaderExample {",
+        "    public static void main(String[] args) {",
+        "        // MISSING LINE",
+        "            System.out.println(reader.readLine());",
+        "        } catch (IOException e) {",
+        "            e.printStackTrace();",
+        "        }",
+        "    }",
+        "}"
+      ],
+      "missingLines": [
+        "try (BufferedReader reader = new BufferedReader(new FileReader(\"data.txt\"))) {"
+      ]
+    }
+  ]
+}
