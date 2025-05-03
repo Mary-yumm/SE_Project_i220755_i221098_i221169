@@ -1,177 +1,305 @@
 {
   "metadata": {
-    "levelId": "level2",
-    "levelName": "The Maze of Misplaced Memory",
+    "levelId": "python_level2",
+    "levelName": "The Trial of Missing Lines",
     "version": "1.0",
-    "createdAt": "2024-03-20",
-    "updatedAt": "2024-03-20",
+    "createdAt": "2025-05-03",
+    "updatedAt": "2025-05-03",
     "difficulty": "intermediate",
-    "estimatedTime": 15,
-    "topics": ["pointers", "memory management", "null safety", "pointer chains"]
-  },
-  "gameState": {
-    "initialState": {
-      "a": 5,
-      "p": null,
-      "lostVar": 99,
-      "q": null,
-      "r": null,
-      "currentPosition": "start"
-    },
-    "winCondition": {
-      "type": "reachExit",
-      "exitPosition": { "x": 18, "y": 11 }
-    }
-  },
-  "map": {
-    "layout": [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-      [1, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1],
-      [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-      [1, 0, 1, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ],
-    "tileTypes": {
-      "wall": 1,
-      "floor": 0,
-      "question": 2,
-      "exit": 3
-    },
-    "dimensions": {
-      "width": 21,
-      "height": 13,
-      "tileSize": 64
-    }
+    "estimatedTime": 20,
+    "topics": ["functions", "generators", "OOP", "decorators", "comprehensions"]
   },
   "puzzles": {
     "questions": [
       {
         "id": "q1",
-        "position": { "x": 8, "y": 5 },
-        "code": "int a = 5;",
-        "question": "You stand before a flickering symbol: &a. How do you properly initialize a pointer to it?",
+        "position": { "x": 12, "y": 5 },
+        "title": "List Transformation",
+        "narrative": "You enter a library with magical scrolls that transform when read. One scroll shows a list of numbers, but part of the incantation is missing...",
+        "code": "numbers = [1, 2, 3, 4, 5]\n# missing line\nprint(squares)",
+        "question": "Which line correctly generates the squares of the numbers?",
         "options": [
-          { "id": "a", "text": "int* p = &a;", "correct": true },
-          { "id": "b", "text": "int* p = a;", "correct": false }
+          {"id": "a", "text": "squares = [x ** 2 for x in numbers]", "correct": true},
+          {"id": "b", "text": "squares = x ** 2 in numbers", "correct": false},
+          {"id": "c", "text": "squares = map(x ** 2, numbers)", "correct": false},
+          {"id": "d", "text": "squares = {x: x ** 2 for x in numbers}", "correct": false}
         ],
         "feedback": {
-          "success": "Correct. Pointer initialized. The path ahead stabilizes.",
-          "failure": "Error: Cannot assign value directly to pointer. The floor flickers dangerously."
-        }
+          "success": "Correct! List comprehensions are the Pythonic way to transform lists.",
+          "failure": "Not quite. Remember list comprehensions use square brackets and follow the pattern [expression for item in iterable]."
+        },
+        "hint": "Look for the option that uses square brackets and a 'for' clause."
       },
       {
         "id": "q2",
-        "position": { "x": 10, "y": 7 },
-        "code": "int* p = &a;",
-        "question": "The pointer p points to a. How do you change a's value through p?",
+        "position": { "x": 2, "y": 2 },
+        "title": "Dictionary Filtering",
+        "narrative": "A magical book of student grades appears. Some names glow faintly - only those who passed should be visible...",
+        "code": "grades = {'Alice': 85, 'Bob': 42, 'Charlie': 90}\n# missing line\nprint(passed)",
+        "question": "Which line correctly filters students with grades ≥ 60?",
         "options": [
-          { "id": "a", "text": "p = 10;", "correct": false },
-          { "id": "b", "text": "*p = 10;", "correct": true }
+          {"id": "a", "text": "passed = {k: v for k, v in grades.items() if v >= 60}", "correct": true},
+          {"id": "b", "text": "passed = filter(lambda v: v >= 60, grades)", "correct": false},
+          {"id": "c", "text": "passed = [k for k in grades if grades[k] > 60]", "correct": false},
+          {"id": "d", "text": "passed = {k for k, v in grades.items() if v > 60}", "correct": false}
         ],
         "feedback": {
-          "success": "Correct! The value at address p is now 10. The path brightens.",
-          "failure": "Memory violation! Cannot assign integer directly to pointer. The walls glitch."
-        }
+          "success": "Perfect! Dictionary comprehensions can filter items while preserving the key-value structure.",
+          "failure": "Almost! Remember you need to preserve both keys and values for the passing students."
+        },
+        "hint": "You need to keep both the name (key) and grade (value) for passing students."
       },
       {
         "id": "q3",
-        "position": { "x": 14, "y": 9 },
-        "code": "int* q = nullptr;",
-        "question": "You feel a cold void. This pointer leads nowhere. What's the safe way to handle it?",
+        "position": { "x": 7, "y": 2 },
+        "title": "Function Decorators",
+        "narrative": "A magical gateway requires special incantations to pass through. You need to wrap your spell in a logging enchantment...",
+        "code": "def log(f):\n    def wrapper(*args, **kwargs):\n        print(\"Calling function\")\n        return f(*args, **kwargs)\n    return wrapper\n\n# missing line\n\ndef greet(name):\n    print(f\"Hello, {name}!\")\n\ngreet(\"Alex\")",
+        "question": "Which line correctly applies the decorator to `greet`?",
         "options": [
-          { "id": "a", "text": "*q = 10;", "correct": false },
-          { "id": "b", "text": "if (q != nullptr) *q = 10;", "correct": true }
+          {"id": "a", "text": "@log", "correct": true},
+          {"id": "b", "text": "log(greet)", "correct": false},
+          {"id": "c", "text": "def greet = log(name):", "correct": false},
+          {"id": "d", "text": "greet = log", "correct": false}
         ],
         "feedback": {
-          "success": "Clever. Null checked. The void stabilizes into a path.",
-          "failure": "Segmentation Fault! The void consumes you. Memory violation detected."
-        }
+          "success": "Excellent! The @ syntax is the standard way to apply decorators in Python.",
+          "failure": "Not quite. Decorators are applied using the @ symbol before the function definition."
+        },
+        "hint": "Python has special syntax for decorators using the @ symbol."
       },
       {
         "id": "q4",
-        "position": { "x": 8, "y": 11 },
-        "code": "int lostVar = 99;\nint* r = &lostVar;",
-        "question": "You've found lostVar, but its value is unstable. Restore it using the pointer chain.",
+        "position": { "x": 4, "y": 4 },
+        "title": "Generator Function",
+        "narrative": "A fountain produces endless streams of water. You need to control the flow to get exactly what you need...",
+        "code": "def count_up_to(n):\n    i = 1\n    while i <= n:\n        # missing line\n        i += 1",
+        "question": "Which line makes this function a generator?",
         "options": [
-          { "id": "a", "text": "r = *p + 5;", "correct": false },
-          { "id": "b", "text": "*r = *p + 5;", "correct": true }
+          {"id": "a", "text": "yield i", "correct": true},
+          {"id": "b", "text": "return i", "correct": false},
+          {"id": "c", "text": "print(i)", "correct": false},
+          {"id": "d", "text": "yield return i", "correct": false}
         ],
         "feedback": {
-          "success": "Memory stabilized! lostVar = 15. The final door unlocks.",
-          "failure": "Invalid pointer assignment! The memory corruption spreads."
-        }
+          "success": "Correct! The yield keyword transforms a function into a generator.",
+          "failure": "Not quite. Generators use yield instead of return to produce values one at a time."
+        },
+        "hint": "Generators use a special keyword that starts with 'y'."
+      },
+      {
+        "id": "q5",
+        "position": { "x": 9, "y": 9 },
+        "title": "Exception Handling",
+        "narrative": "A magical orb sometimes produces unpredictable results. You need to handle its tantrums gracefully...",
+        "code": "try:\n    x = int(\"abc\")\nexcept ValueError:\n    # missing line",
+        "question": "What line handles the exception correctly?",
+        "options": [
+          {"id": "a", "text": "print(\"Invalid number\")", "correct": true},
+          {"id": "b", "text": "raise(\"Invalid number\")", "correct": false},
+          {"id": "c", "text": "catch ValueError: print(\"Error\")", "correct": false},
+          {"id": "d", "text": "ValueError(\"Invalid\")", "correct": false}
+        ],
+        "feedback": {
+          "success": "Well done! This properly handles the ValueError by informing the user.",
+          "failure": "Almost! In the except block, you want to handle the error, not raise a new one."
+        },
+        "hint": "You want to inform the user about the error, not create a new exception."
+      },
+      {
+        "id": "q6",
+        "position": { "x": 6, "y": 8 },
+        "title": "Context Managers",
+        "narrative": "A magical portal requires careful opening and closing. You need to ensure it's properly sealed after use...",
+        "code": "# missing line\n    f.write(\"Hello, Python!\")\n    print(\"File written successfully\")",
+        "question": "Which line correctly opens a file using a context manager?",
+        "options": [
+          {"id": "a", "text": "with open('file.txt', 'w') as f:", "correct": true},
+          {"id": "b", "text": "f = open('file.txt')", "correct": false},
+          {"id": "c", "text": "open('file.txt').with()", "correct": false},
+          {"id": "d", "text": "using open('file.txt') as f:", "correct": false}
+        ],
+        "feedback": {
+          "success": "Correct! The 'with' statement ensures proper resource cleanup.",
+          "failure": "Not quite. Context managers in Python use the 'with' keyword."
+        },
+        "hint": "Look for the option that uses 'with' and 'as' keywords."
+      },
+      {
+        "id": "q7",
+        "position": { "x": 3, "y": 7 },
+        "title": "Multiple Inheritance",
+        "narrative": "Two magical creatures offer their powers. You need to inherit abilities from both to proceed...",
+        "code": "class Flyer:\n    def fly(self):\n        print(\"Flying high!\")\n\nclass Swimmer:\n    def swim(self):\n        print(\"Swimming deep!\")\n\n# missing line\n\nhero = FlyingFish()\nhero.fly()\nhero.swim()",
+        "question": "Which line correctly creates a class that inherits from both?",
+        "options": [
+          {"id": "a", "text": "class FlyingFish(Flyer, Swimmer):", "correct": true},
+          {"id": "b", "text": "class FlyingFish inherits Flyer, Swimmer:", "correct": false},
+          {"id": "c", "text": "class FlyingFish(Flyer(Swimmer)):", "correct": false},
+          {"id": "d", "text": "class FlyingFish extends Flyer, Swimmer:", "correct": false}
+        ],
+        "feedback": {
+          "success": "Excellent! Python supports multiple inheritance by listing parent classes in parentheses.",
+          "failure": "Almost! In Python, you inherit from multiple classes by listing them separated by commas."
+        },
+        "hint": "Python classes inherit by listing parent classes in the class definition."
+      },
+      {
+        "id": "q8",
+        "position": { "x": 8, "y": 5 },
+        "title": "Unpacking Arguments",
+        "narrative": "A magical chest contains three items. You need to unpack them efficiently...",
+        "code": "def spell(a, b, c):\n    print(f\"Casting {a}, {b}, and {c}!\")\n\nitems = ['fire', 'ice', 'lightning']\n# missing line",
+        "question": "Which line correctly unpacks the list into function arguments?",
+        "options": [
+          {"id": "a", "text": "spell(*items)", "correct": true},
+          {"id": "b", "text": "spell(items)", "correct": false},
+          {"id": "c", "text": "spell(items[0], items[1], items[2])", "correct": false},
+          {"id": "d", "text": "spell(unpack items)", "correct": false}
+        ],
+        "feedback": {
+          "success": "Perfect! The * operator unpacks iterables into positional arguments.",
+          "failure": "Close! Python provides special syntax for unpacking iterables into arguments."
+        },
+        "hint": "Look for the option that uses the asterisk (*) operator."
+      },
+      {
+        "id": "q9",
+        "position": { "x": 11, "y": 3 },
+        "title": "Metaclass Magic",
+        "narrative": "The archwizard challenges you to modify the very fabric of magic itself. You need to alter how spells are created at their core...",
+        "code": "class Meta(type):\n    def __new__(cls, name, bases, dct):\n        dct['magic'] = 100\n        return super().__new__(cls, name, bases, dct)\n\n# missing line\n\nprint(Spell.magic)",
+        "question": "Which line correctly uses the metaclass to create a class?",
+        "options": [
+          {"id": "a", "text": "class Spell(metaclass=Meta):", "correct": true},
+          {"id": "b", "text": "class Spell(Meta):", "correct": false},
+          {"id": "c", "text": "class Spell() with Meta:", "correct": false},
+          {"id": "d", "text": "class Spell using Meta:", "correct": false}
+        ],
+        "feedback": {
+          "success": "Brilliant! You've mastered Python's metaclass syntax.",
+          "failure": "Almost! Metaclasses are assigned using the metaclass= keyword argument."
+        },
+        "hint": "Look for the option that uses 'metaclass=' in the class definition."
+      },
+      {
+        "id": "q10",
+        "position": { "x": 5, "y": 6 },
+        "title": "Descriptor Protocol",
+        "narrative": "A sentient spellbook requires special handling. You need to implement proper attribute access control...",
+        "code": "class MagicDescriptor:\n    def __get__(self, obj, objtype):\n        return 42\n\nclass Spellbook:\n    # missing line\n\nbook = Spellbook()\nprint(book.power)",
+        "question": "Which line correctly assigns the descriptor to an attribute?",
+        "options": [
+          {"id": "a", "text": "power = MagicDescriptor()", "correct": true},
+          {"id": "b", "text": "def power(self): return 42", "correct": false},
+          {"id": "c", "text": "power = property(MagicDescriptor)", "correct": false},
+          {"id": "d", "text": "self.power = MagicDescriptor()", "correct": false}
+        ],
+        "feedback": {
+          "success": "Perfect! You've implemented the descriptor protocol correctly.",
+          "failure": "Not quite. Descriptors are assigned as class attributes, not instance attributes."
+        },
+        "hint": "Descriptors work at the class level, not instance level."
+      },
+      {
+        "id": "q11",
+        "position": { "x": 9, "y": 2 },
+        "title": "Async/Await",
+        "narrative": "The time mage challenges you to handle multiple spells simultaneously. You need to cast them concurrently...",
+        "code": "async def cast_spell():\n    print(\"Casting...\")\n    await asyncio.sleep(1)\n    print(\"Spell complete!\")\n\n# missing line\nasyncio.run(main())",
+        "question": "Which line correctly runs multiple spells concurrently?",
+        "options": [
+          {"id": "a", "text": "async def main():\n    await asyncio.gather(cast_spell(), cast_spell())", "correct": true},
+          {"id": "b", "text": "def main():\n    cast_spell()\n    cast_spell()", "correct": false},
+          {"id": "c", "text": "async def main():\n    cast_spell()\n    cast_spell()", "correct": false},
+          {"id": "d", "text": "async def main():\n    await cast_spell()\n    await cast_spell()", "correct": false}
+        ],
+        "feedback": {
+          "success": "Excellent! asyncio.gather runs coroutines concurrently.",
+          "failure": "Close! Remember you want true concurrency, not sequential execution."
+        },
+        "hint": "Look for the option that uses asyncio.gather."
+      },
+      {
+        "id": "q12",
+        "position": { "x": 2, "y": 9 },
+        "title": "Pattern Matching",
+        "narrative": "The shapeshifting dragon requires different spells for each form. You need to match its patterns precisely...",
+        "code": "dragon = {'type': 'fire', 'power': 9001}\n\n# missing line\n    case {'type': 'fire', 'power': p} if p > 9000:\n        print(\"Use ice spell!\")\n    case {'type': 'ice'}:\n        print(\"Use fire spell!\")\n    case _:\n        print(\"Use default spell\")",
+        "question": "Which line correctly starts the pattern matching block?",
+        "options": [
+          {"id": "a", "text": "match dragon:", "correct": true},
+          {"id": "b", "text": "switch dragon:", "correct": false},
+          {"id": "c", "text": "for case in dragon:", "correct": false},
+          {"id": "d", "text": "if match dragon:", "correct": false}
+        ],
+        "feedback": {
+          "success": "Correct! Python 3.10's match statement handles structural pattern matching.",
+          "failure": "Not quite. Python uses 'match' for pattern matching (introduced in 3.10)."
+        },
+        "hint": "Python's pattern matching uses a keyword introduced in version 3.10."
+      },
+      {
+        "id": "q13",
+        "position": { "x": 7, "y": 7 },
+        "title": "Type Annotations",
+        "narrative": "The library of ancient spells requires precise incantations. You need to specify exact spell components...",
+        "code": "# missing line\ndef cast(spell: str, power: int) -> float:\n    return len(spell) * power\n\nresult = cast(\"fireball\", 3)\nprint(f\"Damage: {result}\")",
+        "question": "Which line imports the typing module for complex type hints?",
+        "options": [
+          {"id": "a", "text": "from typing import List, Dict, Union", "correct": true},
+          {"id": "b", "text": "import typehints", "correct": false},
+          {"id": "c", "text": "require types", "correct": false},
+          {"id": "d", "text": "using typing", "correct": false}
+        ],
+        "feedback": {
+          "success": "Perfect! The typing module provides advanced type hint capabilities.",
+          "failure": "Almost! Python's type hints come from the 'typing' module."
+        },
+        "hint": "Python's type system utilities are in a module called 'typing'."
       }
     ]
   },
   "dialogue": {
     "intro": [
-      "Memory Leak Detected.",
-      "A pointer has gone rogue.",
-      "Rebuild the path, or be trapped forever.",
-      "",
-      "You are inside the RAMscape —",
-      "a digital maze formed by memory cells.",
-      "Some addresses are safe.",
-      "Others... corrupted."
+      "Welcome to the Trial of Missing Lines!",
+      "Here you'll face Python puzzles where critical lines of code are missing.",
+      "Your task is to complete each code snippet correctly to progress.",
+      "Pay attention to Python idioms and best practices as you solve each challenge!"
     ],
     "completion": [
-      "Memory stabilized.",
-      "The lost variable has been restored.",
-      "",
-      "You've mastered pointer navigation",
-      "and fixed the memory leak!",
-      "",
-      "Proceed to Level 3."
+      "Congratulations! You've mastered the Trial of Missing Lines!",
+      "You've demonstrated excellent understanding of Python's core features.",
+      "Use these skills to write clean, idiomatic Python code in your future projects!"
     ]
   },
   "visualSettings": {
     "colors": {
-      "primary": "#00ffff",
-      "background": "#0a0a1c",
-      "floor": "#1a1a2e",
-      "grid": "#203050",
-      "success": "#00ff00",
-      "error": "#ff0000",
-      "glitch": "#ff00ff"
+      "primary": "#FF5722",
+      "secondary": "#607D8B",
+      "background": "#263238",
+      "text": "#ECEFF1"
     },
-    "tileSize": 64,
-    "playerScale": 0.8,
     "animations": {
-      "transitionDuration": 500,
-      "shakeIntensity": 0.02,
-      "flashDuration": 500,
-      "glitchDuration": 300
+      "transitionSpeed": 0.5,
+      "highlightDuration": 1.0
     }
   },
   "penalty": {
-    "stepsBack": 2,
-    "message": "Memory Violation! Moved back 2 steps!",
-    "effect": {
-      "type": "glitch",
-      "particles": {
-        "speed": { "min": -150, "max": 150 },
-        "angle": { "min": 0, "max": 360 },
-        "scale": { "start": 0.3, "end": 0 },
-        "lifespan": 400,
-        "quantity": 15
-      }
+    "memoryViolation": {
+      "points": 10,
+      "maxViolations": 3,
+      "description": "Each incorrect attempt costs 10 points. Exceeding 3 violations fails the level."
     }
   },
   "scoring": {
     "questionPoints": {
-      "correct": 50,
-      "incorrect": -20
+      "correct": 20,
+      "incorrect": -5
     },
-    "levelCompletion": 200,
-    "totalPossible": 400,
-    "minimumPassing": 200
+    "levelCompletion": 100,
+    "totalPossible": 200,
+    "minimumPassing": 120,
+    "hintPenalty": 5
   }
-} 
+}

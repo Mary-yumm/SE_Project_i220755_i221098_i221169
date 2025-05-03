@@ -519,3 +519,15 @@ button {
   font-weight: normal;
   margin-left: 10px;
 }
+
+/*score-lives*/
+.scoreLivesContainer{
+  font-weight: bold;
+  position: absolute;
+  top: 10rem;
+  right: 2rem; 
+  }
+.scoreLivesContainer .lives-display{
+  margin: 5px;
+  
+}

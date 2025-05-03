@@ -8,9 +8,9 @@ import {
   updateUserScore,
   logActivity,
 } from "../services/firebaseService";
-import { getAuth } from "firebase/auth";
 import Level1Tutorial from "./Level1Tutorial";
-
+import { saveGameProgress, fetchGameProgress } from '../services/mongoDBService';
+import { getAuth } from 'firebase/auth';
 // Define the coordinates for question positions
 const COORDINATES = [
   { top: "75%", left: "30%" },
@@ -78,6 +78,21 @@ export default function Level1() {
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
   const scoringData = levelData.scoring;
+
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+
+  // Initialize state from MongoDB on load
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (userId) {
+        const progress = await fetchGameProgress(userId, 'level1');
+        setScore(progress.score);
+        setRemainingLives(progress.lives);
+      }
+    };
+    loadProgress();
+  }, [userId]);
 
   // Auto-advance dialogue
   useEffect(() => {
@@ -175,6 +190,7 @@ export default function Level1() {
       setHintUsed(true);
 
       const newScore = score - scoringData.hintPenalty;
+      if (newScore >= 0)
       setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("hint_used", {
@@ -189,12 +205,13 @@ export default function Level1() {
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
+    let newScore;
     if (selectedOption && selectedOption.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       setShowExplanation(true);
 
-      const newScore = score + scoringData.questionPoints.correct;
+       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("correct_answer", {
@@ -202,6 +219,7 @@ export default function Level1() {
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
+      
     } else {
       setShowWrongAnswer(true);
       const lives = remainingLives - 1;
@@ -213,7 +231,7 @@ export default function Level1() {
 
       setUserAnswer("");
 
-      const newScore = score + scoringData.questionPoints.incorrect;
+       newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("incorrect_answer", {
@@ -222,6 +240,11 @@ export default function Level1() {
         score: scoringData.questionPoints.incorrect,
       });
     }
+    await saveGameProgress(userId, 'level1', {
+      score: newScore,
+      lives: remainingLives,
+      lastLifeLost: remainingLives < 3 ? new Date() : null
+    });
   };
 
   const handleNextPosition = async () => {
@@ -248,11 +271,17 @@ export default function Level1() {
           setNextCoord(null);
           setIsMoving(false);
         }, 2000);
+        const finalScore = score + scoringData.levelCompletion;
+        await saveGameProgress(userId, 'level1', {
+          score: finalScore,
+          lives: remainingLives,
+          lastLifeLost: null // Reset on completion
+        });
       }
     } else {
       try {
         const finalScore = score + scoringData.levelCompletion;
-        setScore(finalScore);
+        if (finalScore >= 0) setScore(finalScore);
         await updateUserScore("level1", finalScore);
         await completeLevel("level1");
         await logActivity("level_completed", {
