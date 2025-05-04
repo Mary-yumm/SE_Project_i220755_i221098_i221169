@@ -9,24 +9,26 @@ import {
   updateUserScore,
   logActivity,
 } from "../services/firebaseService";
-import { saveGameProgress, fetchGameProgress } from '../services/mongoDBService';
-import { getAuth } from 'firebase/auth';
+import {
+  saveGameProgress,
+  fetchGameProgress,
+} from "../services/mongoDBService";
+import { getAuth } from "firebase/auth";
 // Define the coordinates for question positions
 const COORDINATES = [
-  { top: "52%", left: "22%" },//1
-  { top: "55%", left: "31%" },//2
-  { top: "70%", left: "37%" },//3
-  { top: "60%", left: "45%" },//4
-  { top: "71.5%", left: "50.5%" },//5
-  { top: "70%", left: "60%" },//6
-  { top: "63%", left: "70%" },//7
-  { top: "55%", left: "76%" },//8
-  { top: "39%", left: "75%" },//9
-  { top: "15%", left: "70%" },//10
-  { top: "13%", left: "48%" },//11
-  { top: "15%", left: "36.5%" },//12
-  { top: "25%", left: "30%" },//13
-
+  { top: "52%", left: "22%" }, //1
+  { top: "55%", left: "31%" }, //2
+  { top: "70%", left: "37%" }, //3
+  { top: "60%", left: "45%" }, //4
+  { top: "71.5%", left: "50.5%" }, //5
+  { top: "70%", left: "60%" }, //6
+  { top: "63%", left: "70%" }, //7
+  { top: "55%", left: "76%" }, //8
+  { top: "39%", left: "75%" }, //9
+  { top: "15%", left: "70%" }, //10
+  { top: "13%", left: "48%" }, //11
+  { top: "15%", left: "36.5%" }, //12
+  { top: "25%", left: "30%" }, //13
 ];
 
 const TimerSelection = ({ onSelect }) => {
@@ -75,8 +77,9 @@ export default function level2() {
 
   //lives and score
   const [score, setScore] = useState(location.state?.score ?? 0);
-  const [remainingLives, setRemainingLives] = useState(location.state?.remainingLives ?? 3);
-
+  const [remainingLives, setRemainingLives] = useState(
+    location.state?.remainingLives ?? 3
+  );
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
@@ -90,20 +93,25 @@ export default function level2() {
     const loadProgress = async () => {
       if (userId) {
         // Only fetch from MongoDB if we don't have values from location state
-        if (location.state === null || 
-            (location.state.score === undefined && location.state.remainingLives === undefined)) {
-          const progress = await fetchGameProgress(userId, 'level2');
+        if (
+          location.state === null ||
+          (location.state.score === undefined &&
+            location.state.remainingLives === undefined)
+        ) {
+          const progress = await fetchGameProgress(userId, "level2");
           if (progress) {
-            if (location.state?.score === undefined) setScore(progress.score || 0);
-            if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+            if (location.state?.score === undefined)
+              setScore(progress.score || 0);
+            if (location.state?.remainingLives === undefined)
+              setRemainingLives(progress.lives || 3);
           }
         }
-        
+
         // Save the current state to MongoDB immediately
-        await saveGameProgress(userId, 'level2', {
+        await saveGameProgress(userId, "level2", {
           score: score,
           lives: remainingLives,
-          lastLifeLost: remainingLives < 3 ? new Date() : null
+          lastLifeLost: remainingLives < 3 ? new Date() : null,
         });
       }
     };
@@ -214,8 +222,7 @@ export default function level2() {
       setHintUsed(true);
 
       const newScore = score - scoringData.hintPenalty;
-      if(newScore>=0)
-      setScore(newScore);
+      if (newScore >= 0) setScore(newScore);
       await updateUserScore("level2", newScore);
       await logActivity("hint_used", {
         level: "level2",
@@ -226,24 +233,25 @@ export default function level2() {
   };
 
   const handleAnswerSubmit = async () => {
+    // Prevent submitting if already showing success
+    if (showSuccess) return;
+
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-    if (selectedOption && selectedOption.correct) {
+
+    if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
-      setShowExplanation(true);
-
-       newScore = score + scoringData.questionPoints.correct;
+      newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level2", newScore);
+      await updateUserScore("level2", newScore); // or "level3" for level3.jsx
       await logActivity("correct_answer", {
-        level: "level2",
+        level: "level2", // or "level3" for level3.jsx
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
-      
     } else {
       setShowWrongAnswer(true);
       const lives = remainingLives - 1;
@@ -252,25 +260,24 @@ export default function level2() {
       if (lives < 3) {
         localStorage.setItem("lastLifeLost", Date.now());
       }
-
       setUserAnswer("");
-
-       newScore = score + scoringData.questionPoints.incorrect;
+      newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
-      await updateUserScore("level2", newScore);
+      await updateUserScore("level2", newScore); // or "level3" for level3.jsx
       await logActivity("incorrect_answer", {
-        level: "level2",
+        level: "level2", // or "level3" for level3.jsx
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.incorrect,
       });
     }
-    await saveGameProgress(userId, 'level2', {
+
+    await saveGameProgress(userId, "level2", {
+      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
-      lastLifeLost: remainingLives < 3 ? new Date() : null
+      lastLifeLost: remainingLives < 3 ? new Date() : null,
     });
   };
-
   const handleNextPosition = async () => {
     // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
@@ -296,16 +303,16 @@ export default function level2() {
           setIsMoving(false);
         }, 2000);
         const finalScore = score + scoringData.levelCompletion;
-        await saveGameProgress(userId, 'level2', {
+        await saveGameProgress(userId, "level2", {
           score: finalScore,
           lives: remainingLives,
-          lastLifeLost: null // Reset on completion
+          lastLifeLost: null, // Reset on completion
         });
       }
     } else {
       try {
         const finalScore = score + scoringData.levelCompletion;
-    
+
         setScore(finalScore);
         await updateUserScore("level2", finalScore);
         await completeLevel("level2");
@@ -379,14 +386,17 @@ export default function level2() {
   return (
     <div className="level2-container">
       <div className="level2-header">
-      <button className="back-button" onClick={() => navigate("/home",
-          {
-            state: { 
-              score: score,
-              remainingLives: remainingLives 
-            } 
+        <button
+          className="back-button"
+          onClick={() =>
+            navigate("/home", {
+              state: {
+                score: score,
+                remainingLives: remainingLives,
+              },
+            })
           }
-        )}>
+        >
           Back to Home
         </button>
         <div className="header-right">
@@ -472,8 +482,12 @@ export default function level2() {
           <div className="question-text">{currentQuestion.question}</div>
 
           {!hintUsed && (
-            <button className="hint-button" onClick={handleHintClick}>
-              Need a Hint? (-5 points)
+            <button
+              className="hint-button"
+              onClick={handleHintClick}
+              disabled={showSuccess}
+            >
+              Need a Hint? (-{scoringData.hintPenalty} points)
             </button>
           )}
 
@@ -490,7 +504,8 @@ export default function level2() {
                 className={`option-button ${
                   userAnswer === option.id ? "selected" : ""
                 }`}
-                onClick={() => setUserAnswer(option.id)}
+                onClick={() => !showSuccess && setUserAnswer(option.id)}
+                disabled={showSuccess}
               >
                 {option.text}
               </button>
@@ -500,7 +515,7 @@ export default function level2() {
           <button
             className="submit-button"
             onClick={handleAnswerSubmit}
-            disabled={!userAnswer}
+            disabled={!userAnswer || showSuccess}
           >
             Submit Answer
           </button>

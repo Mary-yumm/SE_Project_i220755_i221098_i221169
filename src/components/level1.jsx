@@ -9,8 +9,11 @@ import {
   logActivity,
 } from "../services/firebaseService";
 import Level1Tutorial from "./Level1Tutorial";
-import { saveGameProgress, fetchGameProgress } from '../services/mongoDBService';
-import { getAuth } from 'firebase/auth';
+import {
+  saveGameProgress,
+  fetchGameProgress,
+} from "../services/mongoDBService";
+import { getAuth } from "firebase/auth";
 
 // Define the coordinates for question positions
 const COORDINATES = [
@@ -41,11 +44,13 @@ const TimerSelection = ({ onSelect }) => {
 export default function Level1() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Priority is given to values passed from navigation state
   const [score, setScore] = useState(location.state?.score ?? 0);
-  const [remainingLives, setRemainingLives] = useState(location.state?.remainingLives ?? 3);
-  
+  const [remainingLives, setRemainingLives] = useState(
+    location.state?.remainingLives ?? 3
+  );
+
   const [currentPosition, setCurrentPosition] = useState(0);
   const [showQuestion, setShowQuestion] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
@@ -87,20 +92,25 @@ export default function Level1() {
     const loadProgress = async () => {
       if (userId) {
         // Only fetch from MongoDB if we don't have values from location state
-        if (location.state === null || 
-            (location.state.score === undefined && location.state.remainingLives === undefined)) {
-          const progress = await fetchGameProgress(userId, 'level1');
+        if (
+          location.state === null ||
+          (location.state.score === undefined &&
+            location.state.remainingLives === undefined)
+        ) {
+          const progress = await fetchGameProgress(userId, "level1");
           if (progress) {
-            if (location.state?.score === undefined) setScore(progress.score || 0);
-            if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+            if (location.state?.score === undefined)
+              setScore(progress.score || 0);
+            if (location.state?.remainingLives === undefined)
+              setRemainingLives(progress.lives || 3);
           }
         }
-        
+
         // Save the current state to MongoDB immediately
-        await saveGameProgress(userId, 'level1', {
+        await saveGameProgress(userId, "level1", {
           score: score,
           lives: remainingLives,
-          lastLifeLost: remainingLives < 3 ? new Date() : null
+          lastLifeLost: remainingLives < 3 ? new Date() : null,
         });
       }
     };
@@ -210,8 +220,7 @@ export default function Level1() {
       setHintUsed(true);
 
       const newScore = score - scoringData.hintPenalty;
-      if (newScore >= 0)
-      setScore(newScore);
+      if (newScore >= 0) setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("hint_used", {
         level: "level1",
@@ -222,24 +231,25 @@ export default function Level1() {
   };
 
   const handleAnswerSubmit = async () => {
+    // Prevent submitting if already showing success
+    if (showSuccess) return;
+    
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-    if (selectedOption && selectedOption.correct) {
+    
+    if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
-      setShowExplanation(true);
-
-       newScore = score + scoringData.questionPoints.correct;
+      newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level1", newScore);
+      await updateUserScore("level1", newScore); 
       await logActivity("correct_answer", {
         level: "level1",
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
-      
     } else {
       setShowWrongAnswer(true);
       const lives = remainingLives - 1;
@@ -248,8 +258,8 @@ export default function Level1() {
       if (lives < 3) {
         localStorage.setItem("lastLifeLost", Date.now());
       }
-
-       newScore = score + scoringData.questionPoints.incorrect;
+      setUserAnswer("");
+      newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
       await updateUserScore("level1", newScore);
       await logActivity("incorrect_answer", {
@@ -258,13 +268,13 @@ export default function Level1() {
         score: scoringData.questionPoints.incorrect,
       });
     }
-    await saveGameProgress(userId, 'level1', {
+    
+    await saveGameProgress(userId, 'level1', {  // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
       lastLifeLost: remainingLives < 3 ? new Date() : null
     });
   };
-
   const handleNextPosition = async () => {
     // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
@@ -290,10 +300,10 @@ export default function Level1() {
           setIsMoving(false);
         }, 2000);
         const finalScore = score + scoringData.levelCompletion;
-        await saveGameProgress(userId, 'level1', {
+        await saveGameProgress(userId, "level1", {
           score: finalScore,
           lives: remainingLives,
-          lastLifeLost: null // Reset on completion
+          lastLifeLost: null, // Reset on completion
         });
       }
     } else {
@@ -383,14 +393,17 @@ export default function Level1() {
   return (
     <div className="level1-container">
       <div className="level1-header">
-        <button className="back-button" onClick={() => navigate("/home",
-          {
-            state: { 
-              score: score,
-              remainingLives: remainingLives 
-            } 
+        <button
+          className="back-button"
+          onClick={() =>
+            navigate("/home", {
+              state: {
+                score: score,
+                remainingLives: remainingLives,
+              },
+            })
           }
-        )}>
+        >
           Back to Home
         </button>
         <div className="header-right">
@@ -400,7 +413,11 @@ export default function Level1() {
           </div>
           <div className="lives-display">
             <div className="heart-container">
-              <img src="/assets/heart-full.png" className="heart-image" alt="Lives" />
+              <img
+                src="/assets/heart-full.png"
+                className="heart-image"
+                alt="Lives"
+              />
               <p className="lives-count">{remainingLives}</p>
             </div>
           </div>
@@ -494,7 +511,8 @@ export default function Level1() {
                 className={`option-button ${
                   userAnswer === option.id ? "selected" : ""
                 }`}
-                onClick={() => setUserAnswer(option.id)}
+                onClick={() => !showSuccess && setUserAnswer(option.id)}
+                disabled={showSuccess}
               >
                 {option.text}
               </button>
@@ -504,7 +522,7 @@ export default function Level1() {
           <button
             className="submit-button"
             onClick={handleAnswerSubmit}
-            disabled={!userAnswer}
+            disabled={!userAnswer || showSuccess}
           >
             Submit Answer
           </button>
@@ -537,7 +555,6 @@ export default function Level1() {
     </div>
   );
 }
-
 
 /*import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";

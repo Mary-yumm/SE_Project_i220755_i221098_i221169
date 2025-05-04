@@ -8,20 +8,23 @@ import {
   updateUserScore,
   logActivity,
 } from "../services/firebaseService";
-import { saveGameProgress, fetchGameProgress } from '../services/mongoDBService';
-import { getAuth } from 'firebase/auth';
+import {
+  saveGameProgress,
+  fetchGameProgress,
+} from "../services/mongoDBService";
+import { getAuth } from "firebase/auth";
 import { getUserProgress } from "../services/firebaseService";
 
 // Define coordinates for question positions
 const COORDINATES = [
-  { top: "25%", left: "36.5%" },//1
-  { top: "34%", left: "46%" },//2
-  { top: "41%", left: "65.5%" },//3
-  { top: "48%", left: "57%" },//4
-  { top: "45%", left: "83%" },//5
-  { top: "68%", left: "69.5%" },//6
-  { top: "78%", left: "27%" },//7
-  { top: "57%", left: "19%" },//8
+  { top: "25%", left: "36.5%" }, //1
+  { top: "34%", left: "46%" }, //2
+  { top: "41%", left: "65.5%" }, //3
+  { top: "48%", left: "57%" }, //4
+  { top: "45%", left: "83%" }, //5
+  { top: "68%", left: "69.5%" }, //6
+  { top: "78%", left: "27%" }, //7
+  { top: "57%", left: "19%" }, //8
 ];
 
 const TimerSelection = ({ onSelect }) => {
@@ -63,9 +66,11 @@ export default function Level3() {
   const [withTimer, setWithTimer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
-   //lives and score
-   const [score, setScore] = useState(location.state?.score ?? 0);
-   const [remainingLives, setRemainingLives] = useState(location.state?.remainingLives ?? 3);
+  //lives and score
+  const [score, setScore] = useState(location.state?.score ?? 0);
+  const [remainingLives, setRemainingLives] = useState(
+    location.state?.remainingLives ?? 3
+  );
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
   const scoringData = levelData.scoring;
@@ -96,7 +101,6 @@ export default function Level3() {
     return () => clearInterval(interval);
   }, []);
 
-
   useEffect(() => {
     const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
     if (!isNaN(savedLives)) {
@@ -117,30 +121,35 @@ export default function Level3() {
       try {
         const userProgress = await getUserProgress();
         if (!userProgress?.premium?.status) {
-          navigate("/home", { 
-            state: { 
+          navigate("/home", {
+            state: {
               message: "Level 3 requires premium access. Upgrade to continue!",
-              showPremiumPrompt: true 
-            } 
+              showPremiumPrompt: true,
+            },
           });
         } else {
           setIsPremium(true);
-          
+
           // Only fetch from MongoDB if we don't have values from location state
-          if (location.state === null || 
-              (location.state.score === undefined && location.state.remainingLives === undefined)) {
-            const progress = await fetchGameProgress(userId, 'level3');
+          if (
+            location.state === null ||
+            (location.state.score === undefined &&
+              location.state.remainingLives === undefined)
+          ) {
+            const progress = await fetchGameProgress(userId, "level3");
             if (progress) {
-              if (location.state?.score === undefined) setScore(progress.score || 0);
-              if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+              if (location.state?.score === undefined)
+                setScore(progress.score || 0);
+              if (location.state?.remainingLives === undefined)
+                setRemainingLives(progress.lives || 3);
             }
           }
-          
+
           // Save the current state to MongoDB
-          await saveGameProgress(userId, 'level3', {
+          await saveGameProgress(userId, "level3", {
             score: score,
             lives: remainingLives,
-            lastLifeLost: remainingLives < 3 ? new Date() : null
+            lastLifeLost: remainingLives < 3 ? new Date() : null,
           });
         }
       } catch (error) {
@@ -150,27 +159,32 @@ export default function Level3() {
         setLoading(false);
       }
     };
-  
+
     checkPremiumAccess();
   }, [navigate, userId, location.state, score, remainingLives]);
   useEffect(() => {
     const loadProgress = async () => {
       if (userId) {
         // Only fetch from MongoDB if we don't have values from location state
-        if (location.state === null || 
-            (location.state.score === undefined && location.state.remainingLives === undefined)) {
-          const progress = await fetchGameProgress(userId, 'level3');
+        if (
+          location.state === null ||
+          (location.state.score === undefined &&
+            location.state.remainingLives === undefined)
+        ) {
+          const progress = await fetchGameProgress(userId, "level3");
           if (progress) {
-            if (location.state?.score === undefined) setScore(progress.score || 0);
-            if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+            if (location.state?.score === undefined)
+              setScore(progress.score || 0);
+            if (location.state?.remainingLives === undefined)
+              setRemainingLives(progress.lives || 3);
           }
         }
-        
+
         // Save the current state to MongoDB immediately
-        await saveGameProgress(userId, 'level3', {
+        await saveGameProgress(userId, "level3", {
           score: score,
           lives: remainingLives,
-          lastLifeLost: remainingLives < 3 ? new Date() : null
+          lastLifeLost: remainingLives < 3 ? new Date() : null,
         });
       }
     };
@@ -189,7 +203,13 @@ export default function Level3() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [showDialogue, dialogueIndex, autoAdvance, levelData.dialogue?.intro?.length, isPremium]);
+  }, [
+    showDialogue,
+    dialogueIndex,
+    autoAdvance,
+    levelData.dialogue?.intro?.length,
+    isPremium,
+  ]);
 
   // Timer effect
   useEffect(() => {
@@ -279,19 +299,22 @@ export default function Level3() {
   };
 
   const handleAnswerSubmit = async () => {
+    // Prevent submitting if already showing success
+    if (showSuccess) return;
+
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-    
+
     if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level3", newScore);
+      await updateUserScore("level3", newScore); // or "level3" for level3.jsx
       await logActivity("correct_answer", {
-        level: "level3",
+        level: "level3", // or "level3" for level3.jsx
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
@@ -306,20 +329,21 @@ export default function Level3() {
       setUserAnswer("");
       newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
-      await updateUserScore("level3", newScore);
+      await updateUserScore("level3", newScore); // or "level3" for level3.jsx
       await logActivity("incorrect_answer", {
-        level: "level3",
+        level: "level3", // or "level3" for level3.jsx
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.incorrect,
       });
     }
-    await saveGameProgress(userId, 'level3', {
+
+    await saveGameProgress(userId, "level3", {
+      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
-      lastLifeLost: remainingLives < 3 ? new Date() : null
+      lastLifeLost: remainingLives < 3 ? new Date() : null,
     });
   };
-
   const handleNextPosition = async () => {
     if (!showSuccess) return;
 
@@ -343,10 +367,10 @@ export default function Level3() {
           setIsMoving(false);
         }, 2000);
         const finalScore = score + scoringData.levelCompletion;
-        await saveGameProgress(userId, 'level3', {
+        await saveGameProgress(userId, "level3", {
           score: finalScore,
           lives: remainingLives,
-          lastLifeLost: null
+          lastLifeLost: null,
         });
       }
     } else {
@@ -433,14 +457,17 @@ export default function Level3() {
   return (
     <div className="level3-container">
       <div className="level3-header">
-      <button className="back-button" onClick={() => navigate("/home",
-          {
-            state: { 
-              score: score,
-              remainingLives: remainingLives 
-            } 
+        <button
+          className="back-button"
+          onClick={() =>
+            navigate("/home", {
+              state: {
+                score: score,
+                remainingLives: remainingLives,
+              },
+            })
           }
-        )}>
+        >
           Back to Home
         </button>
         <div className="header-right">
@@ -524,7 +551,11 @@ export default function Level3() {
           <div className="question-text">{currentQuestion.question}</div>
 
           {!hintUsed && (
-            <button className="hint-button" onClick={handleHintClick}>
+            <button
+              className="hint-button"
+              onClick={handleHintClick}
+              disabled={showSuccess}
+            >
               Need a Hint? (-{scoringData.hintPenalty} points)
             </button>
           )}
@@ -542,7 +573,8 @@ export default function Level3() {
                 className={`option-button ${
                   userAnswer === option.id ? "selected" : ""
                 }`}
-                onClick={() => setUserAnswer(option.id)}
+                onClick={() => !showSuccess && setUserAnswer(option.id)}
+                disabled={showSuccess}
               >
                 {option.text}
               </button>
@@ -552,11 +584,10 @@ export default function Level3() {
           <button
             className="submit-button"
             onClick={handleAnswerSubmit}
-            disabled={!userAnswer}
+            disabled={!userAnswer || showSuccess}
           >
             Submit Answer
           </button>
-
           {showSuccess && (
             <div className="feedback-success">
               {currentQuestion.feedback.success}
