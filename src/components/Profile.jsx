@@ -5,11 +5,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getUserProgress, updatePremiumStatus, getUserRank, updateUserRank } from "../services/firebaseService";
 import "../styles/ProfilePage.css";
 
-import avatar from "../assets/avatar1.avif";
+import defaultAvatar from "../assets/avatar1.avif";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -39,6 +40,8 @@ export default function ProfilePage() {
 
 function Profile({ user }) {
   const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = useState(defaultAvatar);
+
   const [userProgress, setUserProgress] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -50,6 +53,15 @@ function Profile({ user }) {
   const [bio, setBio] = useState("Aspiring Software Engineer");
   const [language, setLanguage] = useState("JavaScript");
 
+
+  useEffect(() => {
+    const storedAvatarUrl = localStorage.getItem("avatarUrl");
+    if (storedAvatarUrl) {
+      setAvatarUrl(storedAvatarUrl); // Set the avatar from localStorage
+    }
+  }, []);
+
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -98,9 +110,76 @@ function Profile({ user }) {
   };
 
   const changeAvatar = () => {
-    alert("Feature coming soon! 🎨");
+    const existingPopup = document.getElementById("avatar-popup");
+    if (existingPopup) existingPopup.remove();
+  
+    const predefinedAvatars = [
+      "/assets/avatar1.avif",
+      "/assets/avatar2.avif",
+    ];
+  
+    const popup = document.createElement("div");
+    popup.id = "avatar-popup";
+    popup.classList.add("avatar-popup");
+  
+    const title = document.createElement("h3");
+    title.textContent = "🎨 Choose an Avatar";
+    popup.appendChild(title);
+  
+    const avatarContainer = document.createElement("div");
+    avatarContainer.classList.add("avatar-container");
+  
+    predefinedAvatars.forEach((url) => {
+      const avatarImg = document.createElement("img");
+      avatarImg.src = url;
+      avatarImg.alt = "Avatar";
+      avatarImg.classList.add("avatar-image");
+  
+      avatarImg.onclick = () => {
+        setAvatarUrl(url);
+        localStorage.setItem("avatarUrl", url); // Save to localStorage
+        popup.remove();
+      };
+  
+      avatarContainer.appendChild(avatarImg);
+    });
+  
+    // 🔼 Add Image Upload Section
+    const uploadLabel = document.createElement("label");
+    uploadLabel.classList.add("upload-avatar-label");
+    uploadLabel.textContent = "Or upload your own:";
+  
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.classList.add("avatar-upload-input");
+  
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        setAvatarUrl(imageUrl);
+        localStorage.setItem("avatarUrl", imageUrl); // Save to localStorage
+        popup.remove();
+      }
+    };
+  
+    popup.appendChild(avatarContainer);
+    popup.appendChild(uploadLabel);
+    popup.appendChild(fileInput);
+  
+    const closeBtn = document.createElement("button");
+    closeBtn.id = "close-avatar-popup";
+    closeBtn.textContent = "Close";
+    closeBtn.classList.add("close-button");
+    closeBtn.onclick = () => popup.remove();
+  
+    popup.appendChild(closeBtn);
+  
+    document.body.appendChild(popup);
   };
-
+  
+  
   const handleCertificateView = () => {
     navigate("/Certificate", { state: { username: user.displayName || "User" } });
   };
@@ -112,8 +191,8 @@ function Profile({ user }) {
   return (
     <div className="profile-container">
       <div className="profile-left">
-        <img src={avatar} alt="Profile" className="profile-pic" />
-        <button className="change-avatar-btn" onClick={changeAvatar}>
+      <img src={avatarUrl} alt="Profile" className="profile-pic" />
+      <button className="change-avatar-btn" onClick={changeAvatar}>
           Change Avatar
         </button>
       </div>

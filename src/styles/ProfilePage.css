@@ -305,3 +305,53 @@ body {
 .stats-toggle-btn.active {
   background-color: var(--accent);
 }
+
+/*choose avatar*/
+/* Avatar popup styling */
+.avatar-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #190532;
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  text-align: center;
+}
+
+/* Container for avatars */
+.avatar-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* Individual avatar image */
+.avatar-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s ease;
+}
+
+.avatar-image:hover {
+  border: 2px solid #aaa;
+}
+
+/* Close button */
+.close-button {
+  background: #878181;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 15px;
+  cursor: pointer;
+}
