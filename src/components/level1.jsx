@@ -71,6 +71,7 @@ export default function Level1() {
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
   const [memoryViolations, setMemoryViolations] = useState(0);
+  const [correctAnswersCounter, setCorrectAnswersCounter] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
 
@@ -267,17 +268,18 @@ export default function Level1() {
   const handleAnswerSubmit = async () => {
     // Prevent submitting if already showing success
     if (showSuccess) return;
-
+  
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-
+  
     if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
+      setCorrectAnswersCounter(prev => prev + 1); // Increment counter
       await updateUserScore("level1", newScore);
       await logActivity("correct_answer", {
         level: "level1",
@@ -286,6 +288,7 @@ export default function Level1() {
       });
     } else {
       setShowWrongAnswer(true);
+      setCorrectAnswersCounter(0); // Reset counter
       const lives = remainingLives - 1;
       setRemainingLives(lives);
       localStorage.setItem("remainingLives", lives);
@@ -302,9 +305,8 @@ export default function Level1() {
         score: scoringData.questionPoints.incorrect,
       });
     }
-
+  
     await saveGameProgress(userId, "level1", {
-      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
       lastLifeLost: remainingLives < 3 ? new Date() : null,
@@ -488,6 +490,9 @@ export default function Level1() {
               <p className="lives-count">{remainingLives}</p>
             </div>
           </div>
+          <div className="correct-counter">
+    <span>Streak: {correctAnswersCounter}</span>
+  </div>
         </div>
       </div>
 

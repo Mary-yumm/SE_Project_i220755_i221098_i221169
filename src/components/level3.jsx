@@ -60,6 +60,7 @@ export default function Level3() {
   const [showDialogue, setShowDialogue] = useState(true);
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
+  const [correctAnswersCounter, setCorrectAnswersCounter] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [showGameOverPopup, setShowGameOverPopup] = useState(false);
@@ -317,25 +318,27 @@ useEffect(() => {
   const handleAnswerSubmit = async () => {
     // Prevent submitting if already showing success
     if (showSuccess) return;
-
+  
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-
+  
     if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level3", newScore); // or "level3" for level3.jsx
+      setCorrectAnswersCounter(prev => prev + 1); // Increment counter
+      await updateUserScore("level3", newScore);
       await logActivity("correct_answer", {
-        level: "level3", // or "level3" for level3.jsx
+        level: "level3",
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
     } else {
       setShowWrongAnswer(true);
+      setCorrectAnswersCounter(0); // Reset counter
       const lives = remainingLives - 1;
       setRemainingLives(lives);
       localStorage.setItem("remainingLives", lives);
@@ -345,16 +348,15 @@ useEffect(() => {
       setUserAnswer("");
       newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
-      await updateUserScore("level3", newScore); // or "level3" for level3.jsx
+      await updateUserScore("level3", newScore);
       await logActivity("incorrect_answer", {
-        level: "level3", // or "level3" for level3.jsx
+        level: "level3",
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.incorrect,
       });
     }
-
+  
     await saveGameProgress(userId, "level3", {
-      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
       lastLifeLost: remainingLives < 3 ? new Date() : null,
@@ -529,6 +531,10 @@ useEffect(() => {
               <p className="lives-count">{remainingLives}</p>
             </div>
           </div>
+          <div className="correct-counter">
+    <span>Streak: {correctAnswersCounter}</span>
+  </div>
+
         </div>
       </div>
 

@@ -61,6 +61,8 @@ export default function level2() {
   const [currentCoord, setCurrentCoord] = useState(COORDINATES[0]);
   const [nextCoord, setNextCoord] = useState(null);
   const [showDialogue, setShowDialogue] = useState(true);
+    const [correctAnswersCounter, setCorrectAnswersCounter] = useState(0);
+
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
   const [memoryViolations, setMemoryViolations] = useState(0);
@@ -251,25 +253,27 @@ export default function level2() {
   const handleAnswerSubmit = async () => {
     // Prevent submitting if already showing success
     if (showSuccess) return;
-
+  
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-
+  
     if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level2", newScore); // or "level3" for level3.jsx
+      setCorrectAnswersCounter(prev => prev + 1); // Increment counter
+      await updateUserScore("level2", newScore);
       await logActivity("correct_answer", {
-        level: "level2", // or "level3" for level3.jsx
+        level: "level2",
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.correct,
       });
     } else {
       setShowWrongAnswer(true);
+      setCorrectAnswersCounter(0); // Reset counter
       const lives = remainingLives - 1;
       setRemainingLives(lives);
       localStorage.setItem("remainingLives", lives);
@@ -279,22 +283,20 @@ export default function level2() {
       setUserAnswer("");
       newScore = score + scoringData.questionPoints.incorrect;
       if (newScore >= 0) setScore(newScore);
-      await updateUserScore("level2", newScore); // or "level3" for level3.jsx
+      await updateUserScore("level2", newScore);
       await logActivity("incorrect_answer", {
-        level: "level2", // or "level3" for level3.jsx
+        level: "level2",
         questionId: currentQuestion.id,
         score: scoringData.questionPoints.incorrect,
       });
     }
-
+  
     await saveGameProgress(userId, "level2", {
-      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
       lastLifeLost: remainingLives < 3 ? new Date() : null,
     });
   };
-  
 
 
  const handleNextPosition = async () => {
@@ -459,6 +461,10 @@ export default function level2() {
               <p className="lives-count">{remainingLives}</p>
             </div>
           </div>
+          <div className="correct-counter">
+    <span>Streak: {correctAnswersCounter}</span>
+  </div>
+
         </div>
       </div>
 
