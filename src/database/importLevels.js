@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const connectDB = require('./db');
-const { Level } = require('./gameSchema');
 const level2Data = require('../data/level2Data.json');
 
 const importLevels = async () => {
@@ -34,16 +33,6 @@ const importLevels = async () => {
             },
             visualSettings: level2Data.visualSettings
         };
-
-        // Insert or update the level
-        await Level.findOneAndUpdate(
-            { levelId: 'level2' },
-            levelData,
-            { upsert: true, new: true }
-        );
-
-        console.log('Level data imported successfully');
-        process.exit(0);
     } catch (error) {
         console.error('Error importing level data:', error);
         process.exit(1);
