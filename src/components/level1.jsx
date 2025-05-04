@@ -136,6 +136,18 @@ export default function Level1() {
     levelData.dialogue.intro.length,
   ]);
 
+  //to retain question
+  useEffect(() => {
+    const savedPosition = parseInt(
+      localStorage.getItem("level1_currentPosition"),
+      10
+    );
+    if (!isNaN(savedPosition)) {
+      setCurrentPosition(savedPosition);
+      setCurrentCoord(COORDINATES[savedPosition]);
+    }
+  }, []);
+
   // Timer effect
   useEffect(() => {
     let interval;
@@ -193,13 +205,23 @@ export default function Level1() {
       setShowWrongAnswer(true);
       setShowGameOverPopup(true);
       setShowQuestion(false);
+      localStorage.setItem("level1_score", score);
+      localStorage.setItem("level1_lives", remainingLives);
+
       setTimeout(() => {
         setShowGameOverPopup(false);
         navigate("/level1");
       }, 1000);
     }
   }, [remainingLives, navigate]);
+  //rerender the old lives and score
+  useEffect(() => {
+    const savedScore = parseInt(localStorage.getItem("level1_score"), 10);
+    const savedLives = parseInt(localStorage.getItem("level1_lives"), 10);
 
+    if (!isNaN(savedScore)) setScore(savedScore);
+    if (!isNaN(savedLives)) setRemainingLives(savedLives);
+  }, []);
   const handleTimeUp = async () => {
     setTimerActive(false);
     setShowWrongAnswer(true);
@@ -233,18 +255,18 @@ export default function Level1() {
   const handleAnswerSubmit = async () => {
     // Prevent submitting if already showing success
     if (showSuccess) return;
-    
+
     const selectedOption = currentQuestion.options.find(
       (opt) => opt.id === userAnswer
     );
     let newScore;
-    
+
     if (selectedOption?.correct) {
       setTimerActive(false);
       setShowSuccess(true);
       newScore = score + scoringData.questionPoints.correct;
       setScore(newScore);
-      await updateUserScore("level1", newScore); 
+      await updateUserScore("level1", newScore);
       await logActivity("correct_answer", {
         level: "level1",
         questionId: currentQuestion.id,
@@ -268,17 +290,18 @@ export default function Level1() {
         score: scoringData.questionPoints.incorrect,
       });
     }
-    
-    await saveGameProgress(userId, 'level1', {  // or 'level3' for level3.jsx
+
+    await saveGameProgress(userId, "level1", {
+      // or 'level3' for level3.jsx
       score: newScore,
       lives: remainingLives,
-      lastLifeLost: remainingLives < 3 ? new Date() : null
+      lastLifeLost: remainingLives < 3 ? new Date() : null,
     });
   };
   const handleNextPosition = async () => {
     // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
-
+    let nextPosition = currentPosition;
     setTimerActive(false);
     setTimeLeft(60);
     setShowSuccess(false);
@@ -289,7 +312,7 @@ export default function Level1() {
     setHintUsed(false);
 
     if (currentPosition < levelData.puzzles.questions.length - 1) {
-      const nextPosition = currentPosition + 1;
+      nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
         setIsMoving(true);
         setNextCoord(COORDINATES[nextPosition]);
@@ -316,7 +339,7 @@ export default function Level1() {
           level: "level1",
           score: finalScore,
         });
-
+        localStorage.removeItem("level1_currentPosition");
         const completionMessage = document.createElement("div");
         completionMessage.className = "completion-popup";
         completionMessage.innerHTML = `
@@ -338,6 +361,7 @@ export default function Level1() {
     if (withTimer) {
       setTimerActive(true);
     }
+    localStorage.setItem("level1_currentPosition", nextPosition);
   };
 
   const handleDialogueClick = () => {
@@ -448,7 +472,8 @@ export default function Level1() {
               }
             } else if (remainingLives <= 0) {
               setShowGameOverPopup(true);
-
+              localStorage.setItem("level1_score", score);
+              localStorage.setItem("level1_lives", remainingLives);
               setTimeout(() => {
                 setShowGameOverPopup(false);
                 navigate("/level1");
@@ -493,8 +518,12 @@ export default function Level1() {
           <div className="question-text">{currentQuestion.question}</div>
 
           {!hintUsed && (
-            <button className="hint-button" onClick={handleHintClick}>
-              Need a Hint? (-5 points)
+            <button
+              className="hint-button"
+              onClick={handleHintClick}
+              disabled={showSuccess}
+            >
+              Need a Hint? (-{scoringData.hintPenalty} points)
             </button>
           )}
 

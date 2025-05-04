@@ -257,6 +257,15 @@ export default function Level3() {
       }
     }
   }, [location.state]);
+//to retain question no
+useEffect(() => {
+  const savedPosition = parseInt(localStorage.getItem("level3_currentPosition"), 10);
+  if (!isNaN(savedPosition)) {
+    setCurrentPosition(savedPosition);
+    setCurrentCoord(COORDINATES[savedPosition]);
+  }
+}, []);
+
   useEffect(() => {
     if (remainingLives <= 0) {
       setTimerActive(false);
@@ -346,7 +355,7 @@ export default function Level3() {
   };
   const handleNextPosition = async () => {
     if (!showSuccess) return;
-
+    let nextPosition = currentPosition;
     setTimerActive(false);
     setTimeLeft(60);
     setShowSuccess(false);
@@ -356,7 +365,7 @@ export default function Level3() {
     setHintUsed(false);
 
     if (currentPosition < levelData.puzzles.questions.length - 1) {
-      const nextPosition = currentPosition + 1;
+       nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
         setIsMoving(true);
         setNextCoord(COORDINATES[nextPosition]);
@@ -383,6 +392,7 @@ export default function Level3() {
           level: "level3",
           score: finalScore,
         });
+        localStorage.removeItem("level3_currentPosition");
 
         const completionMessage = document.createElement("div");
         completionMessage.className = "completion-popup";
@@ -405,6 +415,8 @@ export default function Level3() {
     if (withTimer) {
       setTimerActive(true);
     }
+    localStorage.setItem("level3_currentPosition", nextPosition);
+
   };
 
   const handleDialogueClick = () => {

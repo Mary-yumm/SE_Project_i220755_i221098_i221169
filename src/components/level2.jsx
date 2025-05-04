@@ -202,6 +202,13 @@ export default function level2() {
     }
   }, [remainingLives, navigate]);
 
+  useEffect(() => {
+    const savedPosition = parseInt(localStorage.getItem("level2_currentPosition"), 10);
+    if (!isNaN(savedPosition)) {
+      setCurrentPosition(savedPosition);
+      setCurrentCoord(COORDINATES[savedPosition]);
+    }
+  }, []);
   const handleTimeUp = async () => {
     setTimerActive(false);
     setShowWrongAnswer(true);
@@ -281,7 +288,7 @@ export default function level2() {
   const handleNextPosition = async () => {
     // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
-
+    let nextPosition = currentPosition;
     setTimerActive(false);
     setTimeLeft(60);
     setShowSuccess(false);
@@ -292,7 +299,7 @@ export default function level2() {
     setHintUsed(false);
 
     if (currentPosition < levelData.puzzles.questions.length - 1) {
-      const nextPosition = currentPosition + 1;
+       nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
         setIsMoving(true);
         setNextCoord(COORDINATES[nextPosition]);
@@ -320,6 +327,7 @@ export default function level2() {
           level: "level2",
           score: finalScore,
         });
+        localStorage.removeItem("level2_currentPosition");
 
         const completionMessage = document.createElement("div");
         completionMessage.className = "completion-popup";
@@ -342,6 +350,8 @@ export default function level2() {
     if (withTimer) {
       setTimerActive(true);
     }
+    localStorage.setItem("level2_currentPosition", nextPosition);
+
   };
 
   const handleDialogueClick = () => {
