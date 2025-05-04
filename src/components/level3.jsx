@@ -1,5 +1,6 @@
+//level3
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/level3.css";
 import questionsData from "../data/level3Data.json";
 import {
@@ -41,6 +42,7 @@ const TimerSelection = ({ onSelect }) => {
 };
 
 export default function Level3() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,24 +57,61 @@ export default function Level3() {
   const [showDialogue, setShowDialogue] = useState(true);
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
-  const [score, setScore] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
   const [showGameOverPopup, setShowGameOverPopup] = useState(false);
   const [withTimer, setWithTimer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
-  const [remainingLives, setRemainingLives] = useState(() => {
-    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
-    return isNaN(savedLives) ? 3 : savedLives;
-  });
-
+   //lives and score
+   const [score, setScore] = useState(location.state?.score ?? 0);
+   const [remainingLives, setRemainingLives] = useState(location.state?.remainingLives ?? 3);
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
   const scoringData = levelData.scoring;
   const auth = getAuth();
   const userId = auth.currentUser?.uid;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+      const lastLost = parseInt(localStorage.getItem("lastLifeLost"), 10);
 
+      if (!isNaN(savedLives) && savedLives < 3 && !isNaN(lastLost)) {
+        const now = Date.now();
+        if (now - lastLost >= 60000) {
+          // 1 minute
+          const updatedLives = savedLives + 1;
+          if (updatedLives <= 3) setRemainingLives(updatedLives);
+          localStorage.setItem("remainingLives", updatedLives);
+
+          if (updatedLives < 3) {
+            localStorage.setItem("lastLifeLost", now); // reset timer for next life
+          } else {
+            localStorage.removeItem("lastLifeLost"); // clear if full
+          }
+        }
+      }
+    }, 10000); // check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+
+  useEffect(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    if (!isNaN(savedLives)) {
+      // Only load from localStorage if we don't have lives from navigation state
+      if (location.state?.remainingLives === undefined) {
+        setRemainingLives(savedLives);
+      }
+    }
+  }, [location.state]);
+  useEffect(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    if (!isNaN(savedLives)) {
+      setRemainingLives(savedLives);
+    }
+  }, []);
   useEffect(() => {
     const checkPremiumAccess = async () => {
       try {
@@ -86,9 +125,23 @@ export default function Level3() {
           });
         } else {
           setIsPremium(true);
-          const progress = await fetchGameProgress(userId, 'level3');
-          setScore(progress.score);
-          setRemainingLives(progress.lives);
+          
+          // Only fetch from MongoDB if we don't have values from location state
+          if (location.state === null || 
+              (location.state.score === undefined && location.state.remainingLives === undefined)) {
+            const progress = await fetchGameProgress(userId, 'level3');
+            if (progress) {
+              if (location.state?.score === undefined) setScore(progress.score || 0);
+              if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+            }
+          }
+          
+          // Save the current state to MongoDB
+          await saveGameProgress(userId, 'level3', {
+            score: score,
+            lives: remainingLives,
+            lastLifeLost: remainingLives < 3 ? new Date() : null
+          });
         }
       } catch (error) {
         console.error("Error checking premium status:", error);
@@ -97,9 +150,32 @@ export default function Level3() {
         setLoading(false);
       }
     };
-
+  
     checkPremiumAccess();
-  }, [navigate, userId]);
+  }, [navigate, userId, location.state, score, remainingLives]);
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (userId) {
+        // Only fetch from MongoDB if we don't have values from location state
+        if (location.state === null || 
+            (location.state.score === undefined && location.state.remainingLives === undefined)) {
+          const progress = await fetchGameProgress(userId, 'level3');
+          if (progress) {
+            if (location.state?.score === undefined) setScore(progress.score || 0);
+            if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+          }
+        }
+        
+        // Save the current state to MongoDB immediately
+        await saveGameProgress(userId, 'level3', {
+          score: score,
+          lives: remainingLives,
+          lastLifeLost: remainingLives < 3 ? new Date() : null
+        });
+      }
+    };
+    loadProgress();
+  }, [userId, location.state]);
 
   // Auto-advance dialogue
   useEffect(() => {
@@ -152,7 +228,15 @@ export default function Level3() {
     }, 10000);
     return () => clearInterval(interval);
   }, []);
-
+  useEffect(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    if (!isNaN(savedLives)) {
+      // Only load from localStorage if we don't have lives from navigation state
+      if (location.state?.remainingLives === undefined) {
+        setRemainingLives(savedLives);
+      }
+    }
+  }, [location.state]);
   useEffect(() => {
     if (remainingLives <= 0) {
       setTimerActive(false);
@@ -349,7 +433,14 @@ export default function Level3() {
   return (
     <div className="level3-container">
       <div className="level3-header">
-        <button className="back-button" onClick={() => navigate("/home")}>
+      <button className="back-button" onClick={() => navigate("/home",
+          {
+            state: { 
+              score: score,
+              remainingLives: remainingLives 
+            } 
+          }
+        )}>
           Back to Home
         </button>
         <div className="header-right">

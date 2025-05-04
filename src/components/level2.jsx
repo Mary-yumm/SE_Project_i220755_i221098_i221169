@@ -1,6 +1,6 @@
 // Level2.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/level2.css";
 import questionsData from "../data/level2Data.json";
 import {
@@ -47,6 +47,7 @@ const TimerSelection = ({ onSelect }) => {
 };
 
 export default function level2() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [currentPosition, setCurrentPosition] = useState(0);
   const [showQuestion, setShowQuestion] = useState(false);
@@ -60,7 +61,6 @@ export default function level2() {
   const [showDialogue, setShowDialogue] = useState(true);
   const [dialogueIndex, setDialogueIndex] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
-  const [score, setScore] = useState(0);
   const [memoryViolations, setMemoryViolations] = useState(0);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
@@ -73,12 +73,11 @@ export default function level2() {
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
 
-  //lives
+  //lives and score
+  const [score, setScore] = useState(location.state?.score ?? 0);
+  const [remainingLives, setRemainingLives] = useState(location.state?.remainingLives ?? 3);
 
-  const [remainingLives, setRemainingLives] = useState(() => {
-    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
-    return isNaN(savedLives) ? 3 : savedLives;
-  });
+
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
   const scoringData = levelData.scoring;
@@ -90,13 +89,26 @@ export default function level2() {
   useEffect(() => {
     const loadProgress = async () => {
       if (userId) {
-        const progress = await fetchGameProgress(userId, 'level2');
-        setScore(progress.score);
-        setRemainingLives(progress.lives);
+        // Only fetch from MongoDB if we don't have values from location state
+        if (location.state === null || 
+            (location.state.score === undefined && location.state.remainingLives === undefined)) {
+          const progress = await fetchGameProgress(userId, 'level2');
+          if (progress) {
+            if (location.state?.score === undefined) setScore(progress.score || 0);
+            if (location.state?.remainingLives === undefined) setRemainingLives(progress.lives || 3);
+          }
+        }
+        
+        // Save the current state to MongoDB immediately
+        await saveGameProgress(userId, 'level2', {
+          score: score,
+          lives: remainingLives,
+          lastLifeLost: remainingLives < 3 ? new Date() : null
+        });
       }
     };
     loadProgress();
-  }, [userId]);
+  }, [userId, location.state]);
 
   // Auto-advance dialogue
   useEffect(() => {
@@ -154,7 +166,15 @@ export default function level2() {
 
     return () => clearInterval(interval);
   }, []);
-
+  useEffect(() => {
+    const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
+    if (!isNaN(savedLives)) {
+      // Only load from localStorage if we don't have lives from navigation state
+      if (location.state?.remainingLives === undefined) {
+        setRemainingLives(savedLives);
+      }
+    }
+  }, [location.state]);
   useEffect(() => {
     const savedLives = parseInt(localStorage.getItem("remainingLives"), 10);
     if (!isNaN(savedLives)) {
@@ -359,7 +379,14 @@ export default function level2() {
   return (
     <div className="level2-container">
       <div className="level2-header">
-        <button className="back-button" onClick={() => navigate("/home")}>
+      <button className="back-button" onClick={() => navigate("/home",
+          {
+            state: { 
+              score: score,
+              remainingLives: remainingLives 
+            } 
+          }
+        )}>
           Back to Home
         </button>
         <div className="header-right">
@@ -506,127 +533,3 @@ export default function level2() {
     </div>
   );
 }
-
-
-
-
-/*import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Phaser from 'phaser';
-import LabyrinthScene from '../game/LabyrinthScene';
-import level2Data from '../data/level2Data.json';
-
-const Level2 = () => {
-  const gameContainer = useRef(null);
-  const navigate = useNavigate();
-  const gameRef = useRef(null);
-  const [score, setScore] = useState(0);
-
-  useEffect(() => {
-    if (gameContainer.current && !gameRef.current) {
-      const config = {
-        type: Phaser.AUTO,
-        parent: gameContainer.current,
-        width: 1280,
-        height: 720,
-        backgroundColor: '#2d2d2d',
-        physics: {
-          default: 'arcade',
-          arcade: {
-            gravity: { y: 0 },
-            debug: false
-          }
-        },
-        scene: LabyrinthScene
-      };
-
-      gameRef.current = new Phaser.Game(config);
-      
-      // Listen for score updates from the game
-      window.addEventListener('scoreUpdate', (event) => {
-        setScore(event.detail.score);
-      });
-    }
-
-    return () => {
-      if (gameRef.current) {
-        gameRef.current.destroy(true);
-        gameRef.current = null;
-      }
-      window.removeEventListener('scoreUpdate', () => {});
-    };
-  }, []);
-
-  return (
-    <div style={{ 
-      position: 'relative',
-      width: '100%',
-      height: '100vh',
-      overflow: 'hidden',
-      backgroundColor: 'var(--background)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{ 
-        position: 'absolute', 
-        top: 0, 
-        width: '100%',
-        padding: '1rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 10
-      }}>
-        <button 
-          onClick={() => navigate("/Home")}
-          style={{
-            padding: '0.5rem 1rem',
-            marginLeft: '2rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          Back to Home
-        </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            borderRadius: '5px',
-            fontWeight: 'bold'
-          }}>
-            Score: {score}
-          </div>
-          <h1 style={{
-            margin: '0 auto',
-            padding: '0.5rem 1rem',
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            borderRadius: '5px'
-          }}>
-            🧠 Level 2: The Labyrinth of Lost Addresses
-          </h1>
-        </div>
-      </div>
-      <div 
-        ref={gameContainer}
-        style={{
-          width: '1280px',
-          height: '720px',
-          border: '2px solid var(--primary)',
-          marginTop: '80px'
-        }}
-      />
-    </div>
-  );
-};
-
-export default Level2;
-*/
