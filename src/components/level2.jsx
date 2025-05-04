@@ -76,10 +76,19 @@ export default function level2() {
   const [timerActive, setTimerActive] = useState(false);
 
   //lives and score
-  const [score, setScore] = useState(location.state?.score ?? 0);
-  const [remainingLives, setRemainingLives] = useState(
-    location.state?.remainingLives ?? 3
-  );
+  const [score, setScore] = useState(() => {
+    if (location.state?.score !== undefined) return location.state.score;
+    const saved = localStorage.getItem("level2_score");
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  const [remainingLives, setRemainingLives] = useState(() => {
+    if (location.state?.remainingLives !== undefined)
+      return location.state.remainingLives;
+    const saved = localStorage.getItem("level2_lives");
+    return saved ? parseInt(saved, 10) : 3;
+  });
+
 
   const levelData = questionsData;
   const currentQuestion = levelData.puzzles.questions[currentPosition];
@@ -285,9 +294,13 @@ export default function level2() {
       lastLifeLost: remainingLives < 3 ? new Date() : null,
     });
   };
-  const handleNextPosition = async () => {
+  
+
+
+ const handleNextPosition = async () => {
     // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
+
     let nextPosition = currentPosition;
     setTimerActive(false);
     setTimeLeft(60);
@@ -299,7 +312,7 @@ export default function level2() {
     setHintUsed(false);
 
     if (currentPosition < levelData.puzzles.questions.length - 1) {
-       nextPosition = currentPosition + 1;
+      nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
         setIsMoving(true);
         setNextCoord(COORDINATES[nextPosition]);
@@ -309,51 +322,77 @@ export default function level2() {
           setNextCoord(null);
           setIsMoving(false);
         }, 2000);
+
+        // Calculate final score after level completion
         const finalScore = score + scoringData.levelCompletion;
+
+        // Save progress including score and lives
         await saveGameProgress(userId, "level2", {
           score: finalScore,
           lives: remainingLives,
           lastLifeLost: null, // Reset on completion
         });
+
+        // Store in localStorage for persistence
+        localStorage.setItem("level2_currentPosition", nextPosition);
+        localStorage.setItem("level2_score", finalScore); // Store updated score
+        localStorage.setItem("level2_lives", remainingLives); // Store remaining lives
       }
     } else {
       try {
         const finalScore = score + scoringData.levelCompletion;
+        if (finalScore >= 0) setScore(finalScore);
 
-        setScore(finalScore);
+        // Update user score and complete level
         await updateUserScore("level2", finalScore);
         await completeLevel("level2");
         await logActivity("level_completed", {
           level: "level2",
           score: finalScore,
         });
+
+        // Clear current level position from localStorage (optional)
         localStorage.removeItem("level2_currentPosition");
 
+        // Create a completion message and display it
         const completionMessage = document.createElement("div");
         completionMessage.className = "completion-popup";
         completionMessage.innerHTML = `
-          <h2 className="completion-title">level 2 Completed! 🎉</h2>
-          <p>Congratulations! You've completed level 2</p>
+          <h2 className="completion-title">Level 2 Completed! 🎉</h2>
+          <p>Congratulations! You've completed Level 2</p>
           <p className="score-display">Final Score: ${finalScore}</p>
           <button 
-            onclick="this.parentElement.remove(); window.location.href='/home';"
             className="completion-button"
           >
             Continue to Home
           </button>
         `;
         document.body.appendChild(completionMessage);
+
+        // Handle home navigation when button is clicked
+        completionMessage.querySelector("button").addEventListener("click", () => {
+          document.body.removeChild(completionMessage); // Remove popup
+          localStorage.setItem("level2_currentPosition", COORDINATES[0]); // Reset to the initial position
+
+          navigate("/home", {
+            state: {
+              isLevelCompleted: true,
+              score: finalScore,
+              remainingLives: remainingLives,
+              source: "level2",
+            },
+          });
+        });
       } catch (error) {
         console.error("Error completing level:", error);
       }
     }
+
+    // If there's a timer, re-enable it
     if (withTimer) {
       setTimerActive(true);
     }
-    localStorage.setItem("level2_currentPosition", nextPosition);
-
   };
-
   const handleDialogueClick = () => {
     if (dialogueIndex < levelData.dialogue.intro.length - 1) {
       setDialogueIndex(dialogueIndex + 1);

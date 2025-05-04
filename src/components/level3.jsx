@@ -191,6 +191,13 @@ export default function Level3() {
     loadProgress();
   }, [userId, location.state]);
 
+  useEffect(() => {
+    const savedPosition = parseInt(localStorage.getItem("level3_currentPosition"), 10);
+    if (!isNaN(savedPosition)) {
+      setCurrentPosition(savedPosition);
+      setCurrentCoord(COORDINATES[savedPosition]);
+    }
+  }, []);
   // Auto-advance dialogue
   useEffect(() => {
     if (showDialogue && autoAdvance && isPremium) {
@@ -354,7 +361,9 @@ useEffect(() => {
     });
   };
   const handleNextPosition = async () => {
+    // Only proceed if the current question was answered successfully
     if (!showSuccess) return;
+
     let nextPosition = currentPosition;
     setTimerActive(false);
     setTimeLeft(60);
@@ -365,7 +374,7 @@ useEffect(() => {
     setHintUsed(false);
 
     if (currentPosition < levelData.puzzles.questions.length - 1) {
-       nextPosition = currentPosition + 1;
+      nextPosition = currentPosition + 1;
       if (COORDINATES[nextPosition]) {
         setIsMoving(true);
         setNextCoord(COORDINATES[nextPosition]);
@@ -374,51 +383,78 @@ useEffect(() => {
           setCurrentCoord(COORDINATES[nextPosition]);
           setNextCoord(null);
           setIsMoving(false);
+          
+          // Save the new position to localStorage
+          localStorage.setItem("level3_currentPosition", nextPosition);
         }, 2000);
+
+        // Calculate final score after level completion
         const finalScore = score + scoringData.levelCompletion;
+
+        // Save progress including score and lives
         await saveGameProgress(userId, "level3", {
           score: finalScore,
           lives: remainingLives,
-          lastLifeLost: null,
+          lastLifeLost: null, // Reset on completion
         });
+
+        // Store in localStorage for persistence
+        localStorage.setItem("level3_score", finalScore);
+        localStorage.setItem("level3_lives", remainingLives);
       }
     } else {
       try {
         const finalScore = score + scoringData.levelCompletion;
-        setScore(finalScore);
+        if (finalScore >= 0) setScore(finalScore);
+
+        // Update user score and complete level
         await updateUserScore("level3", finalScore);
         await completeLevel("level3");
         await logActivity("level_completed", {
           level: "level3",
           score: finalScore,
         });
+
+        // Clear current level position from localStorage
         localStorage.removeItem("level3_currentPosition");
 
+        // Create a completion message and display it
         const completionMessage = document.createElement("div");
         completionMessage.className = "completion-popup";
         completionMessage.innerHTML = `
           <h2 className="completion-title">Level 3 Completed! 🎉</h2>
-          <p>Congratulations! You've mastered this premium level!</p>
+          <p>Congratulations! You've completed Level 3</p>
           <p className="score-display">Final Score: ${finalScore}</p>
           <button 
-            onclick="this.parentElement.remove(); window.location.href='/home';"
             className="completion-button"
           >
             Continue to Home
           </button>
         `;
         document.body.appendChild(completionMessage);
+
+        // Handle home navigation when button is clicked
+        completionMessage.querySelector("button").addEventListener("click", () => {
+          document.body.removeChild(completionMessage);
+          navigate("/home", {
+            state: {
+              isLevelCompleted: true,
+              score: finalScore,
+              remainingLives: remainingLives,
+              source: "level3",
+            },
+          });
+        });
       } catch (error) {
         console.error("Error completing level:", error);
       }
     }
+
+    // If there's a timer, re-enable it
     if (withTimer) {
       setTimerActive(true);
     }
-    localStorage.setItem("level3_currentPosition", nextPosition);
-
   };
-
   const handleDialogueClick = () => {
     if (dialogueIndex < levelData.dialogue.intro.length - 1) {
       setDialogueIndex(dialogueIndex + 1);

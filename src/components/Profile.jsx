@@ -234,13 +234,14 @@ function Profile({ user }) {
 
         <div className="stats-section">
           <div className="stats-header">
-            <h2>Activity & Progress Tracking</h2>
+           {/* <h2>Activity & Progress Tracking</h2>
             <button 
               className={`stats-toggle-btn ${showStats ? 'active' : ''}`}
               onClick={() => setShowStats(!showStats)}
             >
               {showStats ? 'Hide Stats' : 'Show Stats'}
             </button>
+           */}
           </div>
           
           {showStats && (

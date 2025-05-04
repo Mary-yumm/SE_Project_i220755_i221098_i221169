@@ -13,7 +13,10 @@ export default function HomePage() {
   const [showTutorial, setShowTutorial] = useState(true);
   const navigate = useNavigate();
   const location = useLocation(); // Get the current location
-  
+  const isLevelCompleted = location.state?.isLevelCompleted || false;
+  const source = location.state?.source;
+  const [levelStatus, setLevelStatus] = useState([false, false, false]); 
+
   // Initialize with location state if it exists, or from localStorage, or use defaults
   const [currentScore, setCurrentScore] = useState(() => {
     if (location.state?.score !== undefined) return location.state.score;
@@ -36,6 +39,43 @@ export default function HomePage() {
     }
     return 3;
   });
+
+  useEffect(() => {
+    if (isLevelCompleted && source === "level1") {
+      localStorage.setItem("level1Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[0] = true; // Mark level 1 as completed
+        return newStatus;
+      });
+    }
+    if (isLevelCompleted && source === "level2") {
+      localStorage.setItem("level2Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[1] = true; // Mark level 2 as completed
+        return newStatus;
+      });
+    }
+    if (isLevelCompleted && source === "level3") {
+      localStorage.setItem("level3Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[2] = true; // Mark level 3 as completed
+        return newStatus;
+      });
+    }
+  }, [isLevelCompleted, source]); // Dependency array to trigger re-render when these values change
+  
+  useEffect(() => {
+    // Retrieve level completion status from localStorage
+    const level1Completed = localStorage.getItem("level1Completed") === "true";
+    const level2Completed = localStorage.getItem("level2Completed") === "true";
+    const level3Completed = localStorage.getItem("level3Completed") === "true";
+    
+    setLevelStatus([level1Completed, level2Completed, level3Completed]);
+  }, []); // This runs only once when the component mounts
+  
 
   // Check if user is logged in and fetch progress
   useEffect(() => {
@@ -116,7 +156,39 @@ export default function HomePage() {
   const handleTutorialComplete = () => {
     setShowTutorial(false);
   };
+  useEffect(() => {
+    // Always fetch level completion status from localStorage
+    const level1Completed = localStorage.getItem("level1Completed") === "true";
+    const level2Completed = localStorage.getItem("level2Completed") === "true";
+    const level3Completed = localStorage.getItem("level3Completed") === "true";
 
+    setLevelStatus([level1Completed, level2Completed, level3Completed]);
+
+    if (isLevelCompleted && source === "level1") {
+      localStorage.setItem("level1Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[0] = true; // Mark level 1 as completed
+        return newStatus;
+      });
+    }
+    if (isLevelCompleted && source === "level2") {
+      localStorage.setItem("level2Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[1] = true; // Mark level 2 as completed
+        return newStatus;
+      });
+    }
+    if (isLevelCompleted && source === "level3") {
+      localStorage.setItem("level3Completed", "true");
+      setLevelStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[2] = true; // Mark level 3 as completed
+        return newStatus;
+      });
+    }
+  }, [isLevelCompleted, source]); 
   // Save the current game state to localStorage whenever it changes
   useEffect(() => {
     // Get the existing lastLifeLost value if it exists
@@ -239,7 +311,19 @@ export default function HomePage() {
             <p className="level-description">
               Level 1 <br /> Begin your adventure here🌿
             </p>
+            {levelStatus[0] &&(
+              
+<div className="level-completed-banner">
+          🎉 Level completed, you earned a badge!
+          <div className="badgeLevel1">
+            <img src="/assets/badge.png" alt="Badge" className="badge-image1" />
+            <p>C++ Badge</p>
           </div>
+        </div>
+      )}
+          </div>
+     
+
         </div>
         <div
           className={`level ${
@@ -263,6 +347,15 @@ export default function HomePage() {
           <p className="level-description">
             Level 2 <br /> Survive the frozen lands❄️
           </p>
+          {levelStatus[1]  &&(
+        <div className="level-completed-banner">
+          🎉 Level completed, you earned a badge!
+          <div className="badgeLevel2">
+            <img src="/assets/badge.png" alt="Badge" className="badge-image2" />
+            <p>Python Badge</p>
+          </div>
+        </div>
+      )}
         </div>
 
         <div
@@ -290,7 +383,18 @@ export default function HomePage() {
           <p className="level-description">
             Level 3 <br /> Face the fire realm🔥
           </p>
+          {levelStatus[2] &&(
+        <div className="level-completed-banner">
+          🎉 Level completed, you earned a badge!
+          <div className="badgeLevel3">
+            <img src="/assets/badge.png" alt="Badge" className="badge-image3" />
+            <p>Java Badge</p>
+          </div>
         </div>
+        
+      )}
+        </div>
+        
       </div>
 
       {/* Bottom right: Logout Button & Email */}

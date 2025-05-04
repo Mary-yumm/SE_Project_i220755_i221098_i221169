@@ -152,7 +152,7 @@ export default function Certificate() {
           <p className="greytext">This certifies that</p>
           <p className="username">{username}</p>
           <p className="shadowed-text">has successfully completed</p>
-          <p className="challenge-title">Python Escape Challenge</p>
+          <p className="challenge-title">Escape Challenge</p>
           <p>Intermediate Level</p>
           <p className="shadowed-text">with excellence</p>
 
